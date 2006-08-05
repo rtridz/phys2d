@@ -16,47 +16,43 @@
     <!-- Initialise -->
 	<delete dir="${build.dir}"/>
 	<mkdir dir="${build.dir}/classes"/>
+	<mkdir dir="${build.dir}/lib"/>
 	<mkdir dir="${build.dir}/testclasses"/>
-	
-	<input message="Upload password:" addproperty="password"/>
 </target>
 
 <target name="compile" depends="init">
 	<!-- build util, should have no deps -->
 	<javac debug="true" srcdir="src" destdir="${build.dir}/classes" target="1.4" source="1.4">
 	    <classpath>
-	      <pathelement path="lib/vecmath.jar"/>
 	    </classpath>
 	</javac>
-	<jar destfile="lib/phys2d.jar" 
+	<jar destfile="${build.dir}/lib/phys2d.jar" 
 		 basedir="${build.dir}/classes"/>
 	<javac debug="true" srcdir="test" destdir="${build.dir}/testclasses" target="1.4" source="1.4">
 	    <classpath>
-	      <pathelement path="lib/phys2d.jar"/>
-	      <pathelement path="lib/vecmath.jar"/>
+	      <pathelement path="${build.dir}/lib/phys2d.jar"/>
 	    </classpath>
 	</javac>
-	<jar destfile="lib/phys2d-test.jar" 
+	<jar destfile="${build.dir}/lib/phys2d-test.jar" 
 		 basedir="${build.dir}/testclasses"/>
-		 
-	<signjar jar="lib/phys2d.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/> 
-	<signjar jar="lib/phys2d-test.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/>
 </target>
 
 <target name="webstart-build" depends="init, compile">
-	<scp todir="${username}:${password}@${host}:${dir}" 
-		 file="lib/phys2d.jar"
-		 trust="true"
-		 port="122"
-		 verbose="true"/>
-	<scp todir="${username}:${password}@${host}:${dir}" 
-		 file="lib/phys2d-test.jar"
-		 trust="true"
-		 port="122"
-		 verbose="true"/>
-</target>
+	<input message="Keystore password:" addproperty="password"/>
+	
+	<signjar jar="${build.dir}/lib/phys2d.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/> 
+	<signjar jar="${build.dir}/lib/phys2d-test.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/>
 
-<target name="full-webstart-build" depends="webstart-build">
+	<scp todir="${username}:${password}@${host}:${dir}" 
+		 file="${build.dir}/lib/phys2d.jar"
+		 trust="true"
+		 port="122"
+		 verbose="true"/>
+	<scp todir="${username}:${password}@${host}:${dir}" 
+		 file="${build.dir}/lib/phys2d-test.jar"
+		 trust="true"
+		 port="122"
+		 verbose="true"/>
 </target>
 
 </project>
