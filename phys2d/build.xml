@@ -1,7 +1,5 @@
 <project name="phys2d" default="webstart-build" basedir=".">
 
-<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-
 <target name="init">
 	<!-- Deployment Server -->
 	<property name="build.dir" value="target"/>
