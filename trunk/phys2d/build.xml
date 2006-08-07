@@ -1,4 +1,4 @@
-<project name="phys2d" default="webstart-build" basedir=".">
+<project name="phys2d" default="compile" basedir=".">
 
 <target name="init">
 	<!-- Deployment Server -->
