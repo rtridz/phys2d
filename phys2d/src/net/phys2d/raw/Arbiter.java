@@ -199,22 +199,21 @@ public strictfp class Arbiter {
 			float rt2 = r2.dot(tangent);
 			float kTangent = body1.getInvMass() + body2.getInvMass();
 			kTangent += body1.getInvI() * (r1.dot(r1) - rt1 * rt1) + body2.getInvI() * (r2.dot(r2) - rt2 * rt2);
-			c.massTangent = 1.0f /  kTangent;
+			c.massTangent = 1.0f / kTangent;
 
-			// TODO: This hard code 0.1 is probably because of the standard 10 iterations
-			// i.e. 1/10 - this probably isn't right.
 			c.bias = -0.1f * invDT * Math.min(0.0f, c.separation + k_allowedPenetration);
 			
 			// Apply normal + friction impulse
-			Vector2f impulse = MathUtil.scale(c.normal, c.accumulatedNormalImpulse);
-			impulse.add(MathUtil.scale(tangent, c.accumulatedTangentImpulse));
-
-			impulse.scale(body1.getHardness() + body2.getHardness());
-			body1.adjustVelocity(MathUtil.scale(impulse, -body1.getInvMass()));
-			body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1, impulse));
-
-			body2.adjustVelocity(MathUtil.scale(impulse, body2.getInvMass()));
-			body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, impulse));
+			if ((c.accumulatedNormalImpulse != 0) || (c.accumulatedTangentImpulse != 0)) {
+				Vector2f impulse = MathUtil.scale(c.normal, c.accumulatedNormalImpulse);
+				impulse.add(MathUtil.scale(tangent, c.accumulatedTangentImpulse));
+				
+				body1.adjustVelocity(MathUtil.scale(impulse, -body1.getInvMass()));
+				body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1, impulse));
+	
+				body2.adjustVelocity(MathUtil.scale(impulse, body2.getInvMass()));
+				body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, impulse));
+			}
 		}
 	}
 	
@@ -225,7 +224,7 @@ public strictfp class Arbiter {
 	void applyImpulse() {
 		Body b1 = body1;
 		Body b2 = body2;
-
+		
 		for (int i = 0; i < numContacts; ++i)
 		{
 			Contact c = contacts[i];
@@ -236,39 +235,44 @@ public strictfp class Arbiter {
 			r2.sub(b2.getPosition());
 
 			// Relative velocity at contact
-			Vector2f dv =  new Vector2f(b2.getVelocity());
-			dv.add(MathUtil.cross(b2.getAngularVelocity(), r2));
-			dv.sub(b1.getVelocity());
-			dv.sub(MathUtil.cross(b1.getAngularVelocity(),r1));
+			Vector2f relativeVelocity =  new Vector2f(b2.getVelocity());
+			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
+			relativeVelocity.sub(b1.getVelocity());
+			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
 			
 			// Compute normal impulse with bias.
-			float vn = dv.dot(c.normal);
+			float vn = relativeVelocity.dot(c.normal);
+			
 			float normalImpulse = c.massNormal * (-vn + c.bias);
+			
 			// Clamp the accumulated impulse
 			float oldNormalImpulse = c.accumulatedNormalImpulse;
 			c.accumulatedNormalImpulse = Math.max(oldNormalImpulse + normalImpulse, 0.0f);
 			normalImpulse = c.accumulatedNormalImpulse - oldNormalImpulse;
-
+			
 			// Apply contact impulse
 			Vector2f impulse = MathUtil.scale(c.normal, normalImpulse);
-
+			if (normalImpulse < 0) {
+				impulse.scale(1 - ((body1.getHardness() * body2.getHardness()) / 2));
+			}
+			
 			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass()));
 			b1.adjustAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, impulse)));
 
 			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass()));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
-			
+
 			// Relative velocity at contact
-			dv =  new Vector2f(b2.getVelocity());
-			dv.add(MathUtil.cross(b2.getAngularVelocity(), r2));
-			dv.sub(b1.getVelocity());
-			dv.sub(MathUtil.cross(b1.getAngularVelocity(),r1));
+			relativeVelocity = new Vector2f(b2.getVelocity());
+			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
+			relativeVelocity.sub(b1.getVelocity());
+			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(),r1));
 			
 			// Compute friction impulse
 			float maxTangentImpulse = friction * c.accumulatedNormalImpulse;
 
 			Vector2f tangent = MathUtil.cross(1.0f, c.normal);
-			float vt = dv.dot(tangent);
+			float vt = relativeVelocity.dot(tangent);
 			float tangentImpulse = c.massTangent * (-vt);
 
 			// Clamp friction

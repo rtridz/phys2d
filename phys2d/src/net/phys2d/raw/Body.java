@@ -89,7 +89,7 @@ public strictfp class Body {
 	/** The id assigned ot this body */
 	private int id;
 	/** The hardness of this body */
-	private float hardness = 0.5f;
+	private float hardness = 0f;
 
 	/**
 	 * Create a new un-named body
@@ -201,7 +201,7 @@ public strictfp class Body {
 			invMass = 1.0f / mass;
 			//I = mass * (size.x * size.x + size.y * size.y) / 12.0f;
 			
-			I = mass * shape.getSurfaceFactor() / 12.0f;
+			I = (mass * shape.getSurfaceFactor()) / 12.0f;
 			invI = 1.0f / I;
 		}
 		else
