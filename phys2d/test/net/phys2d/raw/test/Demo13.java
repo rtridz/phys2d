@@ -90,7 +90,7 @@ public class Demo13 extends AbstractDemo {
 		
 		Body body2 = new Body("Cue", new Circle(20.0f),1);
 		body2.setPosition(250,0);
-		body2.adjustVelocity(new Vector2f(0,50));
+		body2.adjustVelocity(new Vector2f(0,150));
 		body2.setHardness(1.0f);
 		world.add(body2);
 	}
