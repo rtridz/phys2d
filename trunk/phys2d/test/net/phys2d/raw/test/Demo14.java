@@ -42,6 +42,7 @@ package net.phys2d.raw.test;
 
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
+import net.phys2d.raw.BodyList;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Circle;
 
@@ -69,14 +70,16 @@ public class Demo14 extends AbstractDemo {
 	protected void init(World world) {
 		world.setGravity(0,0);
 		
-		circle1 = new Body("Circle 1", new Circle(20.0f), 10);
+		circle1 = new Body("Circle 1", new Circle(20.0f), 1);
 		circle1.setPosition(150,100);
 		circle1.setHardness(1.0f);
-		circle1.adjustVelocity(new Vector2f(100,0));
+		circle1.setFriction(0.0f);
+		circle1.adjustVelocity(new Vector2f(150,0));
 		world.add(circle1);
-		circle2 = new Body("Circle 2", new Circle(20.0f), 10);
+		circle2 = new Body("Circle 2", new Circle(20.0f), 1);
 		circle2.setPosition(250,100);
 		circle2.setHardness(1.0f);
+		circle2.setFriction(0.0f);
 		world.add(circle2);
 	}
 
@@ -84,7 +87,18 @@ public class Demo14 extends AbstractDemo {
 	 * @see net.phys2d.raw.test.AbstractDemo#update()
 	 */
 	protected void update() {
-		System.out.println(circle1+","+circle2);
+		super.update();
+		
+		float totalVel = 0;
+		Vector2f total = new Vector2f();
+		
+		BodyList list = world.getBodies();
+		for (int i=0;i<list.size();i++) {
+			//System.out.println(list.get(i));
+			total.add(list.get(i).getVelocity());
+		}
+		
+		//System.out.println(total.length());
 	}
 	
 	/**
