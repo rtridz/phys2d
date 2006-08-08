@@ -64,10 +64,14 @@ public strictfp class Contact {
 	float massNormal;
 	/** The mass applied through the tangent at this contact point */
 	float massTangent;
-	/** ? */
+	/** The correction factor penetration */
 	float bias;
 	/** The pair of edges this contact is between */
 	FeaturePair feature = new FeaturePair();
+	/** The restitution at this point of contact */
+	float restitution;
+	/** The bias impulse accumulated */
+	float biasImpulse;
 	
 	/**
 	 * Create a new contact point
@@ -100,6 +104,7 @@ public strictfp class Contact {
 		massNormal = contact.massNormal;
 		massTangent = contact.massTangent;
 		bias = contact.bias;
+		restitution = contact.restitution;
 		feature.set(contact.feature);
 	}
 	
