@@ -65,6 +65,11 @@ public strictfp class Body {
 	private Vector2f velocity = new Vector2f();
 	/** The angular velocity of this body */
 	private float angularVelocity;
+	
+	/** The velocity of this body */
+	private Vector2f biasedVelocity = new Vector2f();
+	/** The angular velocity of this body */
+	private float biasedAngularVelocity;
 
 	/** The force being applied to this body - i.e. driving velocity */
 	private Vector2f force = new Vector2f();
@@ -88,8 +93,8 @@ public strictfp class Body {
 	private String name;
 	/** The id assigned ot this body */
 	private int id;
-	/** The hardness of this body */
-	private float hardness = 0f;
+	/** The restitution of this body */
+	private float restitution = 0f;
 
 	/**
 	 * Create a new un-named body
@@ -151,31 +156,25 @@ public strictfp class Body {
 	}
 	
 	/**
-	 * Set the "hardness" of the body. Hard bodies transfer
+	 * Set the "restitution" of the body. Hard bodies transfer
 	 * momentum well. A value of 1.0 would be a pool ball. The 
 	 * default is 1f
 	 * 
-	 * Note this is very very experimental - hence the terrible
-	 * name.
-	 * 
-	 * @param hard The hardness of this body
+	 * @param rest The restitution of this body
 	 */
-	public void setHardness(float hard) {
-		this.hardness = hard;
+	public void setRestitution(float rest) {
+		this.restitution = rest;
 	}
 	
 	/**
-	 * Get the "hardness" of the body. Hard bodies transfer
+	 * Get the "restitution" of the body. Hard bodies transfer
 	 * momentum well. A value of 1.0 would be a pool ball. The 
-	 * default is 1f
+	 * default is 0f
 	 * 
-	 * Note this is very very experimental - hence the terrible
-	 * name.
-	 * 
-	 * @return The "hardness" of the body
+	 * @return The "restitution" of the body
 	 */
-	public float getHardness() {
-		return hardness;
+	public float getRestitution() {
+		return restitution;
 	}
 	
 	/**
@@ -428,5 +427,49 @@ public strictfp class Body {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Get the bias velocity of this body
+	 * 
+	 * @return The bias velocity of this body
+	 */
+	public ROVector2f getBiasedVelocity() {
+		return biasedVelocity;
+	}
+	
+	/**
+	 * Get the bias angular velocity of this body
+	 * 
+	 * @return The bias angular velocity of this body
+	 */
+	public float getBiasedAngularVelocity() {
+		return biasedAngularVelocity;
+	}
+	
+	/** 
+	 * Adjust the bias velocity of this body
+	 * 
+	 * @param delta The amount to change the velocity by
+	 */
+	public void adjustBiasedVelocity(Vector2f delta) {
+		biasedVelocity.add(delta);
+	}
+	
+	/** 
+	 * Adjust the bias angular velocity of this body
+	 * 
+	 * @param delta The amount to change the velocity by
+	 */
+	public void adjustBiasedAngularVelocity(float delta) {
+		biasedAngularVelocity += delta;
+	}
+	
+	/**
+	 * Reset the bias velocity (done every time step)
+	 */
+	public void resetBias() {
+		biasedVelocity.set(0,0);
+		biasedAngularVelocity = 0;
 	}
 }

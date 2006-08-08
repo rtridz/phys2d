@@ -223,7 +223,7 @@ public strictfp class World implements CollisionContext {
 
 		for (int i=0;i<arbiters.size();i++) {
 			Arbiter arb = (Arbiter) arbiters.get(i);
-			arb.preStep(invDT);
+			arb.preStep(invDT, dt);
 		}
 
 		for (int i = 0; i < joints.size(); ++i) {
@@ -249,9 +249,12 @@ public strictfp class World implements CollisionContext {
 			Body b = (Body) bodies.get(i);
 
 			b.adjustPosition(b.getVelocity(), dt);
+			b.adjustPosition(b.getBiasedVelocity(), dt);
 			
 			b.adjustRotation(dt * b.getAngularVelocity());
+			b.adjustRotation(dt * b.getBiasedAngularVelocity());
 
+			b.resetBias();
 			b.setForce(0,0);
 			b.setTorque(0);
 		}
