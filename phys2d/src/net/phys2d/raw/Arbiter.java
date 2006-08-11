@@ -184,6 +184,7 @@ public strictfp class Arbiter {
 		for (int i = 0; i < numContacts; ++i)
 		{
 			Contact c = contacts[i];
+			c.normal.normalise();
 			
 			Vector2f r1 = new Vector2f(c.position);
 			r1.sub(body1.getPosition());
@@ -197,7 +198,7 @@ public strictfp class Arbiter {
 			kNormal += body1.getInvI() * (r1.dot(r1) - rn1 * rn1) + body2.getInvI() * (r2.dot(r2) - rn2 * rn2);
 			c.massNormal = damping / kNormal;
 			
-			Vector2f tangent = MathUtil.cross(1.0f, c.normal);
+			Vector2f tangent = MathUtil.cross(c.normal, 1.0f);
 			float rt1 = r1.dot(tangent);
 			float rt2 = r2.dot(tangent);
 			float kTangent = body1.getInvMass() + body2.getInvMass();
@@ -207,37 +208,34 @@ public strictfp class Arbiter {
 			// Compute restitution
 			// Relative velocity at contact 
 			Vector2f relativeVelocity =  new Vector2f(body2.getVelocity());
-			relativeVelocity.add(MathUtil.cross(body2.getAngularVelocity(), r2));
+			relativeVelocity.add(MathUtil.cross(r2, body2.getAngularVelocity()));
 			relativeVelocity.sub(body1.getVelocity());
-			relativeVelocity.sub(MathUtil.cross(body1.getAngularVelocity(), r1));
+			relativeVelocity.sub(MathUtil.cross(r1, body1.getAngularVelocity()));
 			
 			float combinedRestitution = (body1.getRestitution() * body2.getRestitution());
 			float relVel = c.normal.dot(relativeVelocity);
 			c.restitution = combinedRestitution * -relVel;
 			c.restitution = Math.max(c.restitution, 0);
 			
-			c.bias = -biasFactor * invDT * Math.min(0.0f, c.separation + allowedPenetration);
-
 			float penVel = -c.separation / dt;
 			if (c.restitution >= penVel) {
-				c.separation = 0;
-				c.bias = 0;
-			} 
+				c.bias = 0; 
+			} else {
+				c.bias = -biasFactor * invDT * Math.min(0.0f, c.separation + allowedPenetration);
+			}
 			
 			// apply damping
 			c.accumulatedNormalImpulse *= damping;
 			
 			// Apply normal + friction impulse
-			if ((c.accumulatedNormalImpulse != 0) || (c.accumulatedTangentImpulse != 0)) {
-				Vector2f impulse = MathUtil.scale(c.normal, c.accumulatedNormalImpulse);
-				impulse.add(MathUtil.scale(tangent, c.accumulatedTangentImpulse));
-				
-				body1.adjustVelocity(MathUtil.scale(impulse, -body1.getInvMass()));
-				body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1, impulse));
-	
-				body2.adjustVelocity(MathUtil.scale(impulse, body2.getInvMass()));
-				body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, impulse));
-			}
+			Vector2f impulse = MathUtil.scale(c.normal, c.accumulatedNormalImpulse);
+			impulse.add(MathUtil.scale(tangent, c.accumulatedTangentImpulse));
+			
+			body1.adjustVelocity(MathUtil.scale(impulse, -body1.getInvMass()));
+			body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1, impulse));
+
+			body2.adjustVelocity(MathUtil.scale(impulse, body2.getInvMass()));
+			body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, impulse));
 			
 			// rest bias
 			c.biasImpulse = 0;
@@ -266,14 +264,14 @@ public strictfp class Arbiter {
 			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
 			relativeVelocity.sub(b1.getVelocity());
 			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
-
+			
 			// Compute normal impulse with bias.
 			float vn = relativeVelocity.dot(c.normal);
 			
 			// bias caculations are now handled seperately hence we only
 			// handle the real impulse caculations here
 			//float normalImpulse = c.massNormal * ((c.restitution - vn) + c.bias);
-			float normalImpulse = c.massNormal * ((c.restitution - vn));
+			float normalImpulse = c.massNormal * (c.restitution - vn);
 			
 			// Clamp the accumulated impulse
 			float oldNormalImpulse = c.accumulatedNormalImpulse;
@@ -289,6 +287,11 @@ public strictfp class Arbiter {
 			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass()));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
 
+			Vector2f tempr1 = new Vector2f(r1);
+			tempr1.normalise();
+			Vector2f tempr2 = new Vector2f(r2);
+			tempr2.normalise();
+			
 			// Compute bias impulse
 			// NEW STUFF FOR SEPERATING BIAS
 			relativeVelocity = new Vector2f(b2.getBiasedVelocity());
@@ -303,13 +306,13 @@ public strictfp class Arbiter {
 			biasImpulse = c.biasImpulse - oldBiasImpulse;
 
 			Vector2f Pb = MathUtil.scale(c.normal, biasImpulse);
-
+			
 			b1.adjustBiasedVelocity(MathUtil.scale(Pb, -b1.getInvMass()));
 			b1.adjustBiasedAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, Pb)));
 
 			b2.adjustBiasedVelocity(MathUtil.scale(Pb, b2.getInvMass()));
-			b2.adjustBiasedAngularVelocity((b2.getInvI() * MathUtil.cross(r2,Pb)));
-			
+			b2.adjustBiasedAngularVelocity((b2.getInvI() * MathUtil.cross(r2, Pb)));
+
 			// END NEW STUFF
 			
 			//
@@ -323,7 +326,7 @@ public strictfp class Arbiter {
 			relativeVelocity.sub(b1.getVelocity());
 			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
 			
-			Vector2f tangent = MathUtil.cross(1.0f, c.normal);
+			Vector2f tangent = MathUtil.cross(c.normal, 1.0f);
 			float vt = relativeVelocity.dot(tangent);
 			float tangentImpulse = c.massTangent * (-vt);
 
@@ -334,13 +337,36 @@ public strictfp class Arbiter {
 
 			// Apply contact impulse
 			impulse = MathUtil.scale(tangent, tangentImpulse);
-
+			
 			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass()));
 			b1.adjustAngularVelocity(-b1.getInvI() * MathUtil.cross(r1, impulse));
 
 			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass()));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
 		}
+	}
+	
+	/**
+	 * Get the energy contained within 2 bodies
+	 * 
+	 * @param body1 The first body
+	 * @param body2 The second body
+	 * @return The energy contained
+	 */
+	protected float getEnergy(Body body1, Body body2) {
+		Vector2f combinedVel = MathUtil.scale(body1.getVelocity(), body1.getMass());
+		combinedVel.add(MathUtil.scale(body2.getVelocity(), body2.getMass()));
+		
+		float combinedInertia = body1.getI() * body1.getAngularVelocity();
+		combinedInertia += body2.getI() * body2.getAngularVelocity();
+		
+		float vel1Energy = body1.getMass() * body1.getVelocity().dot(body1.getVelocity());
+		float vel2Energy = body2.getMass() * body2.getVelocity().dot(body2.getVelocity());
+		float ang1Energy = body1.getI() * (body1.getAngularVelocity() * body1.getAngularVelocity());
+		float ang2Energy = body2.getI() * (body2.getAngularVelocity() * body2.getAngularVelocity());
+		float energy = vel1Energy + vel2Energy + ang1Energy + ang2Energy;
+		
+		return energy;
 	}
 	
 	/**

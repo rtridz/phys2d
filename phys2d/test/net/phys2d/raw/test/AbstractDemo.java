@@ -208,6 +208,7 @@ public abstract class AbstractDemo {
 			g.drawString("Bodies: "+world.getBodies().size(),10,130);
 			g.drawString("R: "+renderTime,10,150);
 			g.drawString("L: "+logicTime,10,170);
+			g.drawString("Energy: "+world.getTotalEnergy(),10,190);
 			g.dispose();
 			strategy.show();
 			renderTime = System.currentTimeMillis() - beforeRender;

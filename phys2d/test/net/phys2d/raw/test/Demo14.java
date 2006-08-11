@@ -42,7 +42,6 @@ package net.phys2d.raw.test;
 
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
-import net.phys2d.raw.BodyList;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Circle;
 
@@ -81,25 +80,6 @@ public class Demo14 extends AbstractDemo {
 		circle2.setRestitution(1.0f);
 		circle2.setFriction(0.0f);
 		world.add(circle2);
-	}
-
-	/**
-	 * @see net.phys2d.raw.test.AbstractDemo#update()
-	 */
-	protected void update() {
-		super.update();
-		
-		float totalVel = 0;
-		Vector2f total = new Vector2f();
-		
-		BodyList list = world.getBodies();
-		for (int i=0;i<list.size();i++) {
-			//System.out.println(list.get(i));
-			total.add(list.get(i).getVelocity());
-			totalVel += list.get(i).getVelocity().length();
-		}
-		
-		System.out.println(total.length()+","+totalVel);
 	}
 	
 	/**

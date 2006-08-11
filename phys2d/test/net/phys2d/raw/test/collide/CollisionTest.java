@@ -82,8 +82,6 @@ public class CollisionTest {
 	/** The rendering strategy */
 	private BufferStrategy strategy;
 	
-	/** True if we should reset the demo on the next loop */
-	private boolean needsReset;
 	/** The size of body A */
 	private Body staticBox = new StaticBody(new Box(40,50));
 	/** The size of body B */
@@ -200,7 +198,6 @@ public class CollisionTest {
 			g.fillRect(0,0,500,500);
 			
 			draw(g);
-			renderGUI(g);
 			g.dispose();
 			strategy.show();
 			
@@ -279,7 +276,7 @@ public class CollisionTest {
 		Line line = (Line) body.getShape();
 
 		g.setColor(Color.gray);
-		drawAABody(g,body,body.getShape().getBounds(),false);
+		drawAABody(g,body,body.getShape().getBounds());
 		
 		g.setColor(Color.black);
 		float xp = body.getPosition().getX();
@@ -321,9 +318,8 @@ public class CollisionTest {
 	 * @param g The graphics context on which to draw the bounds
 	 * @param body The body being drawn
 	 * @param box The bounds object being draw 
-	 * @param fill True if we should fill the bounds
 	 */
-	protected void drawAABody(Graphics2D g, Body body, AABox box, boolean fill) {
+	protected void drawAABody(Graphics2D g, Body body, AABox box) {
 		float width2 = box.getWidth() / 2;
 		float height2 = box.getHeight() / 2;
 		
@@ -343,7 +339,7 @@ public class CollisionTest {
 	protected void drawCircleBody(Graphics2D g, Body body, boolean fill) {
 		Circle circle = (Circle) body.getShape();
 		drawCircleBody(g,body,circle,fill);
-		drawAABody(g,body,body.getShape().getBounds(),false);
+		drawAABody(g,body,body.getShape().getBounds());
 	}
 
 	/**
@@ -400,17 +396,9 @@ public class CollisionTest {
 			g.draw(pol);
 		}
 		g.setColor(Color.gray);
-		drawAABody(g,body,body.getShape().getBounds(),false);
+		drawAABody(g,body,body.getShape().getBounds());
 	}
 	
-	/**
-	 * Demo customisable GUI render
-	 * 
-	 * @param g The graphics context to use for rendering here
-	 */
-	protected void renderGUI(Graphics2D g) {
-	}
-
 	/**
 	 * A mouse handler to handle dragging the collision shapes around
 	 * 

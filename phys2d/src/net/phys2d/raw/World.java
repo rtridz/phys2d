@@ -206,7 +206,7 @@ public strictfp class World implements CollisionContext {
 
 		for (int i = 0; i < bodies.size(); ++i)
 		{
-			Body b = (Body) bodies.get(i);
+			Body b = bodies.get(i);
 
 			if (b.getInvMass() == 0.0f) {
 				continue;
@@ -222,31 +222,31 @@ public strictfp class World implements CollisionContext {
 		}
 
 		for (int i=0;i<arbiters.size();i++) {
-			Arbiter arb = (Arbiter) arbiters.get(i);
+			Arbiter arb = arbiters.get(i);
 			arb.preStep(invDT, dt);
 		}
 
 		for (int i = 0; i < joints.size(); ++i) {
-			Joint j = (Joint) joints.get(i);
+			Joint j = joints.get(i);
 			j.preStep(invDT);	
 		}
 
 		for (int i = 0; i < iterations; ++i)
 		{
 			for (int k=0;k<arbiters.size();k++) {
-				Arbiter arb = (Arbiter) arbiters.get(k);
+				Arbiter arb = arbiters.get(k);
 				arb.applyImpulse();
 			}
 			
 			for (int k=0;k<joints.size();++k) {
-				Joint j = (Joint) joints.get(k);
+				Joint j = joints.get(k);
 				j.applyImpulse();
 			}
 		}
 
 		for (int i=0;i < bodies.size(); ++i)
 		{
-			Body b = (Body) bodies.get(i);
+			Body b = bodies.get(i);
 
 			b.adjustPosition(b.getVelocity(), dt);
 			b.adjustPosition(b.getBiasedVelocity(), dt);
@@ -274,11 +274,11 @@ public strictfp class World implements CollisionContext {
 		// O(n^2) broad-phase
 		for (int i = 0; i < bodyList.size(); ++i)
 		{
-			Body bi = (Body) bodyList.get(i);
+			Body bi = bodyList.get(i);
 
 			for (int j = i + 1; j < bodyList.size(); ++j)
 			{
-				Body bj = (Body) bodyList.get(j);
+				Body bj = bodyList.get(j);
 
 				if (bi.getInvMass() == 0.0f && bj.getInvMass() == 0.0f) {
 					continue;
@@ -300,7 +300,7 @@ public strictfp class World implements CollisionContext {
 				{
 					if (arbiters.contains(newArb)) {
 						int index = arbiters.indexOf(newArb);
-						Arbiter arb = (Arbiter) arbiters.get(index);
+						Arbiter arb = arbiters.get(index);
 						arb.update(newArb.getContacts(), newArb.getNumContacts());
 					} else {
 						arbiters.add(newArb);
@@ -313,5 +313,20 @@ public strictfp class World implements CollisionContext {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Get the total energy in the system
+	 * 
+	 * @return The total energy in all the bodies in the system
+	 */
+	public float getTotalEnergy() {
+		float total = 0;
+		
+		for (int i=0;i<bodies.size();i++) {
+			total += bodies.get(i).getEnergy();
+		}
+		
+		return total;
 	}
 }

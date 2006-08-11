@@ -176,6 +176,18 @@ public final strictfp class MathUtil {
 	{
 		return new Vector2f(-s * a.y, s * a.x);
 	}
+
+	/**
+	 * Find the cross product of a vector and a float
+	 * 
+	 * @param s The scalar float
+	 * @param a The vector to fidn the cross of
+	 * @return A newly created resultant vector
+	 */
+	public static Vector2f cross(Vector2f a, float s)
+	{
+		return new Vector2f(s * a.y, -s * a.x);
+	}
 	
 	/**
 	 * Clamp a value 
