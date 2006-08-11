@@ -94,7 +94,7 @@ public strictfp class CircleCircleCollider implements Collider {
 		
 		Vector2f normal = MathUtil.sub(bodyB.getPosition(),bodyA.getPosition());
 		float sep = (circleA.getRadius() + circleB.getRadius()) - normal.length();
-		
+
 		normal.normalise();
 		Vector2f pt = MathUtil.scale(normal, circleA.getRadius());
 		pt.add(bodyA.getPosition());

@@ -104,7 +104,7 @@ public strictfp class Vector2f implements ROVector2f {
 	 * @see net.phys2d.math.ROVector2f#dot(net.phys2d.math.ROVector2f)
 	 */
 	public float dot(ROVector2f other) {
-		return x * other.getX() + y * other.getY();
+		return (x * other.getX()) + (y * other.getY());
 	}
 	
 	/**
@@ -134,7 +134,8 @@ public strictfp class Vector2f implements ROVector2f {
 	 */
 	public void add(ROVector2f v)
 	{
-		x += v.getX(); y += v.getY();
+		x += v.getX(); 
+		y += v.getY();
 	}
 	
 	/**
@@ -144,7 +145,8 @@ public strictfp class Vector2f implements ROVector2f {
 	 */
 	public void sub(ROVector2f v)
 	{
-		x -= v.getX(); y -= v.getY();
+		x -= v.getX(); 
+		y -= v.getY();
 	}
 
 	/**
@@ -154,7 +156,8 @@ public strictfp class Vector2f implements ROVector2f {
 	 */
 	public void scale(float a)
 	{
-		x *= a; y *= a;
+		x *= a; 
+		y *= a;
 	}
 
 	/**
@@ -174,7 +177,7 @@ public strictfp class Vector2f implements ROVector2f {
 	 * @return The length of the vector squared
 	 */
 	public float lengthSquared() {
-		return x * x + y * y;
+		return (x * x) + (y * y);
 	}
 	
 	/**
@@ -202,6 +205,6 @@ public strictfp class Vector2f implements ROVector2f {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[Vec "+x+","+y+"]";
+		return "[Vec "+x+","+y+" ("+length()+")]";
 	}
 }

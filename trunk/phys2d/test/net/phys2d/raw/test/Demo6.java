@@ -53,12 +53,8 @@ import net.phys2d.raw.shapes.Box;
  * @author Kevin Glass
  */
 public class Demo6 extends AbstractDemo {
-	/** The world in which the demo takes place */
-	private World world;
 	/** The block to move */
 	private Body ball;
-	/** True if we've already hit this demo */
-	private boolean hit;
 	
 	/**
 	 * Create a simple demo
@@ -82,7 +78,6 @@ public class Demo6 extends AbstractDemo {
 	 * @see net.phys2d.raw.test.AbstractDemo#init(net.phys2d.raw.World)
 	 */
 	protected void init(World world) {
-		hit = false;
 		this.world = world;
 		
 		Body body;
@@ -133,13 +128,13 @@ public class Demo6 extends AbstractDemo {
 		// turner
 		body = new Body("Turner", new Box(40.0f, 40.0f), 0.1f);
 		body.setPosition(390.0f, 330);
-		body.setFriction(0.1f);
+		body.setFriction(0f);
 		world.add(body);
 		j = new BasicJoint(base,body,new Vector2f(390,335));
 		world.add(j);
 		Body top = new Body("Top",new Box(40.0f, 5.0f), 0.01f);
 		top.setPosition(390.0f, 307.5f);
-		top.setFriction(0.1f);
+		top.setFriction(0f);
 		world.add(top);
 		j = new BasicJoint(top,body,new Vector2f(410,310));
 		world.add(j);

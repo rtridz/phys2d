@@ -156,6 +156,24 @@ public strictfp class Body {
 	}
 	
 	/**
+	 * Get the mass of this body
+	 * 
+	 * @return The mass of this body
+	 */
+	public float getMass() {
+		return mass;
+	}
+
+	/**
+	 * Get the inertia of this body
+	 * 
+	 * @return The inertia of this body 
+	 */
+	public float getI() {
+		return I;
+	}
+	
+	/**
 	 * Set the "restitution" of the body. Hard bodies transfer
 	 * momentum well. A value of 1.0 would be a pool ball. The 
 	 * default is 1f
@@ -471,5 +489,17 @@ public strictfp class Body {
 	public void resetBias() {
 		biasedVelocity.set(0,0);
 		biasedAngularVelocity = 0;
+	}
+	
+	/**
+	 * Get the energy contained in this body
+	 * 
+	 * @return The energy contained in this body
+	 */
+	public float getEnergy() {
+		float velEnergy = getMass() * getVelocity().dot(getVelocity());
+		float angEnergy = getI() * (getAngularVelocity() * getAngularVelocity());
+		
+		return velEnergy + angEnergy;
 	}
 }

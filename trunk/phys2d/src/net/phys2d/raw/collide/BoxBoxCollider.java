@@ -289,10 +289,11 @@ public strictfp class BoxBoxCollider implements Collider {
 		Matrix2f RotAT = rotA.transpose();
 		Matrix2f RotBT = rotB.transpose();
 
-		Vector2f a1 = rotA.col1;
-		Vector2f a2 = rotA.col2;
-		Vector2f b1 = rotB.col1;
-		Vector2f b2 = rotB.col2;
+		// unused?
+//		Vector2f a1 = rotA.col1;
+//		Vector2f a2 = rotA.col2;
+//		Vector2f b1 = rotB.col1;
+//		Vector2f b2 = rotB.col2;
 
 		Vector2f dp = MathUtil.sub(posB,posA);
 		Vector2f dA = MathUtil.mul(RotAT,dp);

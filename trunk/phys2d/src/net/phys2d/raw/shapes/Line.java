@@ -68,8 +68,6 @@ public strictfp class Line extends AbstractShape {
 	private Vector2f proj = new Vector2f(0,0);
 
 	/** Temporary storage - declared globally to reduce GC */
-	private Vector2f temp = new Vector2f(0,0);
-	/** Temporary storage - declared globally to reduce GC */
 	private Vector2f closest = new Vector2f(0,0);
 	/** Temporary storage - declared globally to reduce GC */
 	private Vector2f other = new Vector2f(0,0);
