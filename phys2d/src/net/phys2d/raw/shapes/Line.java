@@ -113,6 +113,12 @@ public strictfp class Line extends AbstractShape {
 		if (height < 10) {
 			height = 50;
 		}
+		if (end.getY() < start.getY()) {
+			yoffset = -yoffset;
+		}
+		if (end.getX() < start.getX()) {
+			xoffset = -xoffset;
+		}
 		bounds = new AABox(xoffset,yoffset,width,height);
 		
 		set(start,end);
@@ -330,5 +336,56 @@ public strictfp class Line extends AbstractShape {
 		Line line = new Line(x,y,x+end.getX(),y+end.getY());
 		
 		return line;
+	}
+	
+	/**
+	 * Move this line a certain amount
+	 * 
+	 * @param v The amount to move the line
+	 */
+	public void move(ROVector2f v) {
+		Vector2f temp = new Vector2f(start);
+		temp.add(v);
+		start = temp;
+		temp = new Vector2f(end);
+		temp.add(v);
+		end = temp;
+	}
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return "[Line "+start+","+end+"]";
+	}
+	
+	/**
+	 * Intersect this line with another
+	 * 
+	 * @param other The other line we should intersect with
+	 * @return The intersection point or null if the lines are parallel
+	 */
+	public Vector2f intersect(Line other) {
+		float dx1 = end.getX() - start.getX();
+		float dx2 = other.end.getX() - other.start.getX();
+		float dy1 = end.getY() - start.getY();
+		float dy2 = other.end.getY() - other.start.getY();
+		float denom = (dy2 * dx1) - (dx2 * dy1);
+		
+		if (denom == 0) {
+			return null;
+		}
+		
+		float ua = (dx2 * (start.getY() - other.start.getY())) - (dy2 * (start.getX() - other.start.getX()));
+		ua /= denom;
+		float ub = (dx1 * (start.getY() - other.start.getY())) - (dy1 * (start.getX() - other.start.getX()));
+		ub /= denom;
+		
+		float u = ua;
+		
+		float ix = start.getX() + (u * (end.getX() - start.getX()));
+		float iy = start.getY() + (u * (end.getY() - start.getY()));
+		
+		return new Vector2f(ix,iy);
 	}
 }

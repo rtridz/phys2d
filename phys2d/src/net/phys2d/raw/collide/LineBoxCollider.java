@@ -130,7 +130,6 @@ public strictfp class LineBoxCollider implements Collider {
 		
 		if (centre < linePos) {
 			normal.scale(-1);
-			
 			for (int i=0;i<4;i++) {
 				if (tangent[i] > linePos) {
 					if (proj[i] < 0) {
@@ -144,14 +143,11 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left >= 0) && (right <= 0)) {
+						if ((left >= 0) && (right >= 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getStart());
 							
-							contacts[numContacts].setSeparation(0);//linePos - tangent[i]);
-							contacts[numContacts].setPosition(pos);
-							contacts[numContacts].setNormal(normal);
-							contacts[numContacts].setFeature(new FeaturePair(i));
+							resolveEndPointCollision(pos,bodyA,bodyB,normal,leftLine,rightLine,contacts[numContacts],i);
 							numContacts++;
 						}
 					} else if (proj[i] > 1) {
@@ -169,10 +165,7 @@ public strictfp class LineBoxCollider implements Collider {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getEnd());
 
-							contacts[numContacts].setSeparation(0); //linePos - tangent[i]);
-							contacts[numContacts].setPosition(pos);
-							contacts[numContacts].setNormal(normal);
-							contacts[numContacts].setFeature(new FeaturePair(i));
+							resolveEndPointCollision(pos,bodyA,bodyB,normal,leftLine,rightLine,contacts[numContacts],i);
 							numContacts++;
 						}
 					} else {
@@ -204,10 +197,7 @@ public strictfp class LineBoxCollider implements Collider {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getStart());
 
-							contacts[numContacts].setSeparation(0); //-(linePos - tangent[i]));
-							contacts[numContacts].setPosition(pos);
-							contacts[numContacts].setNormal(normal);
-							contacts[numContacts].setFeature(new FeaturePair(i));
+							resolveEndPointCollision(pos,bodyA,bodyB,normal,leftLine,rightLine,contacts[numContacts],i);
 							numContacts++;
 						}
 					} else if (proj[i] > 1) {
@@ -221,14 +211,11 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left <= 0) && (right >= 0)) {
+						if ((left <= 0) && (right <= 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getEnd());
 
-							contacts[numContacts].setSeparation(0); //-(linePos - tangent[i]));
-							contacts[numContacts].setPosition(pos);
-							contacts[numContacts].setNormal(normal);
-							contacts[numContacts].setFeature(new FeaturePair(i));
+							resolveEndPointCollision(pos,bodyA,bodyB,normal,leftLine,rightLine,contacts[numContacts],i);
 							numContacts++;
 						}
 					} else {
@@ -251,6 +238,45 @@ public strictfp class LineBoxCollider implements Collider {
 		return numContacts;
 	}
 
+	/**
+	 * Resolve the collision math around an end point
+	 * 
+	 * @param pos The position of the contact
+	 * @param bodyA The first body in the collision
+	 * @param bodyB The second body in the collision
+	 * @param leftLine The line to the left of the vertex of collision
+	 * @param rightLine The line to the right of the vertex of collision
+	 * @param contact The contact to populate
+	 * @param i The index of teh face we're resolving for feature ID
+	 */
+	private void resolveEndPointCollision(Vector2f pos, Body bodyA, Body bodyB, Vector2f norm, Line leftLine, Line rightLine, Contact contact, int i) {
+		Vector2f start = new Vector2f(pos);
+		Vector2f end = new Vector2f(start);
+		end.add(norm);
+		
+		rightLine.move(bodyA.getPosition());
+		leftLine.move(bodyA.getPosition());
+		Line normLine = new Line(start,end);
+		Vector2f rightPoint = normLine.intersect(rightLine);
+		Vector2f leftPoint = normLine.intersect(leftLine);
+		
+		float dis1 = Float.MAX_VALUE;
+		if (rightPoint != null) {
+			dis1 = rightPoint.distance(start) - norm.length();
+		}
+		float dis2 = Float.MAX_VALUE;
+		if (leftPoint != null) {
+			dis2 = leftPoint.distance(start) - norm.length();
+		}
+		
+		norm.normalise();
+		float dis = Math.min(dis1,dis2);
+		
+		contact.setSeparation(-dis);
+		contact.setPosition(pos);
+		contact.setNormal(norm);
+		contact.setFeature(new FeaturePair(i));
+	}
 	/**
 	 * Get a specified point in the array using wrap round
 	 * 
