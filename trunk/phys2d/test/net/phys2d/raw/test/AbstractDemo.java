@@ -60,6 +60,7 @@ import net.phys2d.raw.BasicJoint;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.BodyList;
 import net.phys2d.raw.Contact;
+import net.phys2d.raw.FixedJoint;
 import net.phys2d.raw.Joint;
 import net.phys2d.raw.JointList;
 import net.phys2d.raw.World;
@@ -356,6 +357,17 @@ public abstract class AbstractDemo {
 	 * @param j The joint to be drawn
 	 */
 	public void drawJoint(Graphics2D g, Joint j) {
+		if (j instanceof FixedJoint) {
+			FixedJoint joint = (FixedJoint) j;
+			
+			g.setColor(Color.red);
+			float x1 = joint.getBody1().getPosition().getX();
+			float x2 = joint.getBody2().getPosition().getX();
+			float y1 = joint.getBody1().getPosition().getY();
+			float y2 = joint.getBody2().getPosition().getY();
+			
+			g.drawLine((int) x1,(int) y1,(int) x2,(int) y2);
+		}
 		if (j instanceof BasicJoint) {
 			BasicJoint joint = (BasicJoint) j;
 			

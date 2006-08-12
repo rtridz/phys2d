@@ -247,6 +247,7 @@ public strictfp class LineBoxCollider implements Collider {
 	 * @param leftLine The line to the left of the vertex of collision
 	 * @param rightLine The line to the right of the vertex of collision
 	 * @param contact The contact to populate
+	 * @param norm The normal determined for the line
 	 * @param i The index of teh face we're resolving for feature ID
 	 */
 	private void resolveEndPointCollision(Vector2f pos, Body bodyA, Body bodyB, Vector2f norm, Line leftLine, Line rightLine, Contact contact, int i) {
