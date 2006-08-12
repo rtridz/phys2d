@@ -58,6 +58,7 @@ public interface BroadCollisionStrategy {
 	 * @param context The context that can actually perform the collision
 	 * checking.
 	 * @param bodies The complete list of bodies to be computed
+	 * @param dt The amount of time passed since last collision
 	 */
-	public void collideBodies(CollisionContext context, BodyList bodies);
+	public void collideBodies(CollisionContext context, BodyList bodies, float dt);
 }

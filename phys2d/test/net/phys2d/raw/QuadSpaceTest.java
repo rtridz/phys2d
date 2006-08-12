@@ -110,7 +110,7 @@ public class QuadSpaceTest extends JFrame implements CollisionContext {
 			step = COLLIDE;
 		} else if (step == COLLIDE) {
 			System.out.println("Colliding");
-			strat.collideBodies(this, bodies);
+			strat.collideBodies(this, bodies, 0);
 			spaces = strat.getSpaces();
 			
 		}
@@ -156,9 +156,9 @@ public class QuadSpaceTest extends JFrame implements CollisionContext {
 	}
 	
 	/**
-	 * @see net.phys2d.raw.CollisionContext#resolve(net.phys2d.raw.BodyList)
+	 * @see net.phys2d.raw.CollisionContext#resolve(net.phys2d.raw.BodyList, float)
 	 */
-	public void resolve(BodyList bodies) {
+	public void resolve(BodyList bodies, float dt) {
 	}
 	
 	/**
