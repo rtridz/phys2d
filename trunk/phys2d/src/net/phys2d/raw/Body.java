@@ -97,6 +97,8 @@ public strictfp class Body {
 	private float restitution = 0f;
 	/** The list of bodies excluded from colliding with this body */
 	private BodyList excluded = new BodyList();
+	/** True if this body is effected by gravity */
+	private boolean gravity = true;
 	
 	/**
 	 * Create a new un-named body
@@ -118,6 +120,66 @@ public strictfp class Body {
 		this("UnnamedBody",shape,m);
 	}
 
+	
+	/**
+	 * Create a named body
+	 * 
+	 * @param name The name to assign to the body
+	 * @param shape The shape describing this body
+	 * @param m The mass of the body
+	 */
+	public Body(String name,DynamicShape shape, float m) {
+		this(name,(Shape) shape,m);
+	}
+	
+	/**
+	 * Create a named body
+	 * 
+	 * @param name The name to assign to the body
+	 * @param shape The shape describing this body
+	 * @param m The mass of the body
+	 */
+	protected Body(String name,Shape shape, float m) {
+		this.name = name;
+
+		id = NEXT_ID++;
+		position.set(0.0f, 0.0f);
+		rotation = 0.0f;
+		velocity.set(0.0f, 0.0f);
+		angularVelocity = 0.0f;
+		force.set(0.0f, 0.0f);
+		torque = 0.0f;
+		friction = 0.2f;
+
+		//size.set(1.0f, 1.0f);
+		mass = INFINITE_MASS;
+		invMass = 0.0f;
+		I = INFINITE_MASS;
+		invI = 0.0f;
+		
+		set(shape,m);
+	}
+	
+	/**
+	 * Indicate whether this body should be effected by 
+	 * gravity
+	 * 
+	 * @param gravity True if this body should be effected
+	 * by gravity
+	 */
+	public void setGravityEffected(boolean gravity) {
+		this.gravity = gravity;
+	}
+	
+	/**
+	 * Check if this body is effected by gravity
+	 * 
+	 * @return True if this body is effected by gravity
+	 */
+	public boolean getGravityEffected() {
+		return (gravity) || (I == INFINITE_MASS);
+	}
+	
 	/**
 	 * Add a body that this body is not allowed to collide with, i.e.
 	 * the body specified will collide with this body
@@ -157,45 +219,6 @@ public strictfp class Body {
 	 */
 	public BodyList getExcludedList() {
 		return excluded;
-	}
-	
-	/**
-	 * Create a named body
-	 * 
-	 * @param name The name to assign to the body
-	 * @param shape The shape describing this body
-	 * @param m The mass of the body
-	 */
-	public Body(String name,DynamicShape shape, float m) {
-		this(name,(Shape) shape,m);
-	}
-	
-	/**
-	 * Create a named body
-	 * 
-	 * @param name The name to assign to the body
-	 * @param shape The shape describing this body
-	 * @param m The mass of the body
-	 */
-	protected Body(String name,Shape shape, float m) {
-		this.name = name;
-
-		id = NEXT_ID++;
-		position.set(0.0f, 0.0f);
-		rotation = 0.0f;
-		velocity.set(0.0f, 0.0f);
-		angularVelocity = 0.0f;
-		force.set(0.0f, 0.0f);
-		torque = 0.0f;
-		friction = 0.2f;
-
-		//size.set(1.0f, 1.0f);
-		mass = INFINITE_MASS;
-		invMass = 0.0f;
-		I = INFINITE_MASS;
-		invI = 0.0f;
-		
-		set(shape,m);
 	}
 	
 	/**
