@@ -1,13 +1,12 @@
 package net.phys2d.raw;
 
-import net.phys2d.math.Vector2f;
-
 /**
  * Oops. Forgot to document this one.
  * 
  * @author Kevin Glass
  */
 public interface Joint {
+	
 	/**
 	 * Set the relaxtion value on this joint. This value determines
 	 * how loose the joint will be
@@ -29,15 +28,6 @@ public interface Joint {
 	 * @return The second body attached to this joint
 	 */
 	public abstract Body getBody2();
-
-	/**
-	 * Reconfigure this joint
-	 * 
-	 * @param b1 The first body attached to this joint
-	 * @param b2 The second body attached to this joint
-	 * @param anchor The static anchor point between the joints
-	 */
-	public abstract void set(Body b1, Body b2, Vector2f anchor);
 	
 	/**
 	 * Apply the impulse caused by the joint to the bodies attached.
