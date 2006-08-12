@@ -135,9 +135,6 @@ public class CollisionSpace implements CollisionContext {
 		for (int i = 0; i < bodyList.size(); ++i)
 		{
 			Body bi = bodyList.get(i);
-			if (bi.getInvMass() == 0) {
-				continue;
-			}
 			
 			for (int j = i+1; j < bodyList.size(); ++j)
 			{
