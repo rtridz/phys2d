@@ -166,6 +166,9 @@ public strictfp class World extends CollisionSpace {
 		{
 			Body b = bodies.get(i);
 
+			if (!b.getGravityEffected()) {
+				continue;
+			}
 			if (b.getInvMass() == 0.0f) {
 				continue;
 			}
