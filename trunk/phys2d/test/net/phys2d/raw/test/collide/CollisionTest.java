@@ -91,7 +91,7 @@ public class CollisionTest {
 	/** The size of body D */
 	private Body dynamicCircle = new Body(new Circle(36), 0);
 	/** The size of body E */
-	private Body staticLine = new StaticBody(new Line(190,50));
+	private Body staticLine = new StaticBody(new Line(100,100));
 	
 	/** The element we're current controlling */
 	private int current = 1;
@@ -105,12 +105,12 @@ public class CollisionTest {
 		staticBox.setPosition(200,300);
 		staticBox.setRotation(0.4f);
 		dynamicBox.setPosition(350,250);
-		dynamicBox.setRotation(0.4f);
+		//dynamicBox.setRotation(0.4f);
 		staticCircle.setPosition(150,400);
 		staticCircle.setRotation(0.8f);
 		dynamicCircle.setPosition(250,430);
 		dynamicCircle.setRotation(0.3f);
-		staticLine.setPosition(200,150);
+		staticLine.setPosition(200,100);
 	}
 	
 	/**
