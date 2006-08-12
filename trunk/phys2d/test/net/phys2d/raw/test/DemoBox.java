@@ -161,6 +161,7 @@ public class DemoBox extends AbstractDemo {
 		box.add(new Demo14());
 		box.add(new Demo15());
 		box.add(new Demo16());
+		box.add(new Demo17());
 		box.start();
 	}
 }

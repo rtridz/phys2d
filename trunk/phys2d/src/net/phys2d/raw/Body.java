@@ -95,7 +95,9 @@ public strictfp class Body {
 	private int id;
 	/** The restitution of this body */
 	private float restitution = 0f;
-
+	/** The list of bodies excluded from colliding with this body */
+	private BodyList excluded = new BodyList();
+	
 	/**
 	 * Create a new un-named body
 	 * 
@@ -116,6 +118,47 @@ public strictfp class Body {
 		this("UnnamedBody",shape,m);
 	}
 
+	/**
+	 * Add a body that this body is not allowed to collide with, i.e.
+	 * the body specified will collide with this body
+	 * 
+	 * @param other The body to exclude from collisions with this body
+	 */
+	public void addExcludedBody(Body other) {
+		if (other.equals(this)) {
+			return;
+		}
+		if (!excluded.contains(other)) {
+			excluded.add(other);
+			other.addExcludedBody(this);
+		}
+	}
+	
+	/**
+	 * Remove a body from the excluded list of this body. i.e. the
+	 * body specified will be allowed to collide with this body again
+	 * 
+	 * @param other The body to remove from the exclusion list
+	 */
+	public void removeExcludedBody(Body other) {
+		if (other.equals(this)) {
+			return;
+		}
+		if (excluded.contains(other)) {
+			excluded.remove(other);
+			other.removeExcludedBody(this);
+		}
+	}
+	
+	/**
+	 * Get the list of bodies that can not collide with this body
+	 * 
+	 * @return The list of bodies that can not collide with this body
+	 */
+	public BodyList getExcludedList() {
+		return excluded;
+	}
+	
 	/**
 	 * Create a named body
 	 * 
@@ -426,7 +469,7 @@ public strictfp class Body {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[Body '"+name+"' "+position+" vel: "+velocity+" ("+angularVelocity+")]";
+		return "[Body '"+name+"' id: "+id+" pos: "+position+" vel: "+velocity+" ("+angularVelocity+")]";
 	}
 	
 	/**

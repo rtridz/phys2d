@@ -90,10 +90,23 @@ public strictfp class Arbiter {
 	/**
 	 * Perform the collision analysis between the two bodies 
 	 * arbitrated
+	 * 
+	 * @param dt The amount of time passed since last collision check
 	 */
-	public void collide() {
-		numContacts = Collide.collide(contacts, body1, body2);
+	public void collide(float dt) {
+		numContacts = Collide.collide(contacts, body1, body2, dt);
 	} 
+	
+	/**
+	 * Get one of the two contacts handled being handled by this
+	 * arbiter
+	 * 
+	 * @param index The index of the contact to retrieve
+	 * @return The contact or null if no contact has been detected 
+	 */
+	Contact getContact(int index) {
+		return contacts[index];
+	}
 	
 	/**
 	 * Initialise state for this arbiter - this is only done 

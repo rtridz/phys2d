@@ -70,10 +70,11 @@ public class QuadSpaceStrategy implements BroadCollisionStrategy {
 		this.maxInSpace = maxInSpace;
 		this.maxLevels = maxLevels;
 	}
+	
 	/**
-	 * @see net.phys2d.raw.BroadCollisionStrategy#collideBodies(net.phys2d.raw.CollisionContext, net.phys2d.raw.BodyList)
+	 * @see net.phys2d.raw.BroadCollisionStrategy#collideBodies(net.phys2d.raw.CollisionContext, net.phys2d.raw.BodyList, float)
 	 */
-	public void collideBodies(CollisionContext context, BodyList bodies) {
+	public void collideBodies(CollisionContext context, BodyList bodies, float dt) {
 		spaces.clear();
 		
 		Space space = new Space(0,0,0,0);
@@ -90,7 +91,7 @@ public class QuadSpaceStrategy implements BroadCollisionStrategy {
 		splitSpace(space, 0, maxInSpace, spaces);
 		
 		for (int i=0;i<spaces.size();i++) {
-			context.resolve((Space) spaces.get(i));
+			context.resolve((Space) spaces.get(i), dt);
 		}
 	}
 

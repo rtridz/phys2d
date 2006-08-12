@@ -56,13 +56,13 @@ public strictfp class Collide {
 	 * @param contacts The points of contact that should be populated
 	 * @param bodyA The first body
 	 * @param bodyB The second body
+	 * @param dt The amount of time that's passed since we last checked collision
 	 * @return The number of points at which the two bodies contact
 	 */
-	public static int collide(Contact[] contacts, Body bodyA, Body bodyB)
+	public static int collide(Contact[] contacts, Body bodyA, Body bodyB, float dt)
 	{
 		Collider collider = bodyA.getShape().getCollider(bodyB.getShape());
 		
 		return collider.collide(contacts, bodyA, bodyB);
-		
 	}
 }

@@ -59,6 +59,15 @@ public class BodyList {
 	}
 	
 	/**
+	 * Create a new list containing the elements specified
+	 * 
+	 * @param list The list of elements to add to the new list
+	 */
+	private BodyList(BodyList list) {
+		elements.addAll(list.elements);
+	}
+	
+	/**
 	 * Add a body to the list
 	 * 
 	 * @param body The body to add
@@ -110,5 +119,32 @@ public class BodyList {
 	 */
 	public boolean contains(Body body) {
 		return elements.contains(body);
+	}
+	
+	/**
+	 * Get a list of bodies containing all of the bodies in this
+	 * list except those specified
+	 * 
+	 * @param others The bodies that should be removed from the contents
+	 * @return The list of bodies excluding those specified
+	 */
+	public BodyList getContentsExcluding(BodyList others) {
+		BodyList list = new BodyList(this);
+		list.elements.removeAll(others.elements);
+		
+		return list;
+	}
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		String str = "[BodyList ";
+		for (int i=0;i<elements.size();i++) {
+			str += get(i)+",";
+		}
+		str += "]";
+		
+		return str;
 	}
 }

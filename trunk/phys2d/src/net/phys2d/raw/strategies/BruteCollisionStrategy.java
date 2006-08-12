@@ -49,10 +49,10 @@ import net.phys2d.raw.CollisionContext;
 public class BruteCollisionStrategy implements BroadCollisionStrategy {
 
 	/**
-	 * @see net.phys2d.raw.BroadCollisionStrategy#collideBodies(net.phys2d.raw.CollisionContext, net.phys2d.raw.BodyList)
+	 * @see net.phys2d.raw.BroadCollisionStrategy#collideBodies(net.phys2d.raw.CollisionContext, net.phys2d.raw.BodyList, float)
 	 */
-	public void collideBodies(CollisionContext context, BodyList bodies) {
-		context.resolve(bodies);
+	public void collideBodies(CollisionContext context, BodyList bodies, float dt) {
+		context.resolve(bodies, dt);
 	}
 
 }

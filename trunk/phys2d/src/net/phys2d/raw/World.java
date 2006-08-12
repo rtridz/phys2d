@@ -49,19 +49,13 @@ import net.phys2d.raw.strategies.BruteCollisionStrategy;
  * 
  * @author Kevin Glass
  */
-public strictfp class World implements CollisionContext {
-	/** The bodies contained in the world */
-	private BodyList bodies = new BodyList(); 
+public strictfp class World extends CollisionSpace {
 	/** The joints contained in the world */
 	private JointList joints = new JointList(); 
-	/** The arbiters that have been required in the world */
-	private ArbiterList arbiters = new ArbiterList(); 
 	/** The direction and force of gravity */
 	private Vector2f gravity = new Vector2f(0,0);
 	/** The number of iteration to run each step */
 	private int iterations;
-	/** The broad phase collision strategy we're using */
-	private BroadCollisionStrategy collisionStrategy;
 
 	/**
 	 * Create a new physics model World
@@ -84,20 +78,11 @@ public strictfp class World implements CollisionContext {
 	 * collision on
 	 */
 	public World(Vector2f gravity, int iterations, BroadCollisionStrategy strategy) {
+		super(strategy);
+		
 		this.gravity = gravity;
 		this.iterations = iterations;
-		this.collisionStrategy = strategy;
-	}
 
-	/**
-	 * Set the strategy used to determine the bodies for collision in the
-	 * broad phase.
-	 * 
-	 * @param strategy The strategy used to determine which bodies to check detailed
-	 * collision on
-	 */
-	public void setCollisionStrategy(BroadCollisionStrategy strategy) {
-		this.collisionStrategy = strategy;
 	}
 	
 	/**
@@ -109,15 +94,6 @@ public strictfp class World implements CollisionContext {
 	public void setGravity(float x, float y) {
 		gravity.x = x;
 		gravity.y = y;
-	}
-	
-	/**
-	 * Retrieve a immutable list of bodies in the simulation
-	 * 
-	 * @return The list of bodies
-	 */
-	public BodyList getBodies() {
-		return bodies;
 	}
 
 	/**
@@ -136,24 +112,6 @@ public strictfp class World implements CollisionContext {
 	 */
 	public ArbiterList getArbiters() {
 		return arbiters;
-	}
-	
-	/**
-	 * Add a body to the simulation
-	 * 
-	 * @param body The body to be added
-	 */
-	public void add(Body body) {
-		bodies.add(body);
-	}
-	
-	/**
-	 * Remove a body from the simulation
-	 * 
-	 * @param body The body to be removed
-	 */
-	public void remove(Body body) {
-		bodies.remove(body);
 	}
 	
 	/**
@@ -178,9 +136,9 @@ public strictfp class World implements CollisionContext {
 	 * Remove all the elements from this world
 	 */
 	public void clear() {
-		bodies.clear();
+		super.clear();
+		
 		joints.clear();
-		arbiters.clear();
 	}
 
 	/**
@@ -202,7 +160,7 @@ public strictfp class World implements CollisionContext {
 	public void step(float dt) {
 		float invDT = dt > 0.0f ? 1.0f / dt : 0.0f;
 
-		broadPhase();
+		broadPhase(dt);
 
 		for (int i = 0; i < bodies.size(); ++i)
 		{
@@ -262,58 +220,12 @@ public strictfp class World implements CollisionContext {
 	
 	/**
 	 * The broad collision phase
+	 * 
+	 * @param dt The amount of time passed since last collision phase
 	 */
-	void broadPhase() {
-		collisionStrategy.collideBodies(this, bodies);
+	void broadPhase(float dt) {
+		collide(dt);
 	} 
-	
-	/**
-	 * @see net.phys2d.raw.CollisionContext#resolve(net.phys2d.raw.BodyList)
-	 */
-	public void resolve(BodyList bodyList) {
-		// O(n^2) broad-phase
-		for (int i = 0; i < bodyList.size(); ++i)
-		{
-			Body bi = bodyList.get(i);
-
-			for (int j = i + 1; j < bodyList.size(); ++j)
-			{
-				Body bj = bodyList.get(j);
-
-				if (bi.getInvMass() == 0.0f && bj.getInvMass() == 0.0f) {
-					continue;
-				}
-				if (!bi.getShape().getBounds().touches(bi.getPosition().getX(), 
-													   bi.getPosition().getY(), 
-													   bj.getShape().getBounds(), 
-													   bj.getPosition().getX(), 
-													   bj.getPosition().getY())) {
-
-					arbiters.remove(new Arbiter(bi,bj));
-					continue;
-				}
-
-				Arbiter newArb = new Arbiter(bi, bj);
-				newArb.collide();
-				
-				if (newArb.getNumContacts() > 0)
-				{
-					if (arbiters.contains(newArb)) {
-						int index = arbiters.indexOf(newArb);
-						Arbiter arb = arbiters.get(index);
-						arb.update(newArb.getContacts(), newArb.getNumContacts());
-					} else {
-						arbiters.add(newArb);
-						newArb.init();
-					}
-				}
-				else
-				{
-					arbiters.remove(newArb);
-				}
-			}
-		}
-	}
 	
 	/**
 	 * Get the total energy in the system
