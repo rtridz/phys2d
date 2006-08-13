@@ -216,11 +216,12 @@ public strictfp class Arbiter {
 	 * 
 	 * @param dt The amount of time to step the simulation by
 	 * @param invDT The inverted time
+	 * @param damping The percentage of energy to retain through out
+	 * collision. (1 = no loss, 0 = total loss)
 	 */
-	void preStep(float invDT, float dt) {
+	void preStep(float invDT, float dt, float damping) {
 		float allowedPenetration = 0.01f;
 		float biasFactor = 0.8f;
-		float damping = 1f;
 		
 		for (int i = 0; i < numContacts; ++i)
 		{

@@ -58,7 +58,9 @@ public strictfp class World extends CollisionSpace {
 	private Vector2f gravity = new Vector2f(0,0);
 	/** The number of iteration to run each step */
 	private int iterations;
-
+	/** The damping in effect in the system */
+	private float damping = 1;
+	
 	/**
 	 * Create a new physics model World
 	 * 
@@ -85,6 +87,18 @@ public strictfp class World extends CollisionSpace {
 		this.gravity = gravity;
 		this.iterations = iterations;
 
+	}
+	
+	/**
+	 * Set the amount of energy retained during collisions
+	 * across the system. This might be used to simulate
+	 * sound, heat type losses
+	 * 
+	 * @param damping The amount of energy retain across the system
+	 * (1 = no loss, 0 = total loss)
+	 */
+	public void setDamping(float damping) {
+		this.damping = damping;
 	}
 	
 	/**
@@ -186,7 +200,7 @@ public strictfp class World extends CollisionSpace {
 
 		for (int i=0;i<arbiters.size();i++) {
 			Arbiter arb = arbiters.get(i);
-			arb.preStep(invDT, dt);
+			arb.preStep(invDT, dt, damping);
 		}
 
 		for (int i = 0; i < joints.size(); ++i) {
