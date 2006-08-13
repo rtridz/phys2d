@@ -40,6 +40,8 @@
  */
 package net.phys2d.raw;
 
+import java.util.ArrayList;
+
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.strategies.BruteCollisionStrategy;
 
@@ -229,6 +231,31 @@ public strictfp class World extends CollisionSpace {
 	void broadPhase(float dt) {
 		collide(dt);
 	} 
+	
+	/**
+	 * Get a list of collisions at the current time for a given body
+	 * 
+	 * @param body The body to check for
+	 * @return The list of collision events describing the current contacts
+	 */
+	public CollisionEvent[] getContacts(Body body) {
+		ArrayList collisions = new ArrayList();
+		
+		for (int i=0;i<arbiters.size();i++) {
+			Arbiter arb = arbiters.get(i);
+			
+			if (arb.concerns(body)) {
+				for (int j=0;j<arb.getNumContacts();j++) {
+					Contact contact = arb.getContact(j);
+					CollisionEvent event = new CollisionEvent(0, arb.getBody1(), arb.getBody2(), contact.getPosition(), contact.getNormal(), contact.getSeparation());
+					
+					collisions.add(event);
+				}
+			}
+		}
+		
+		return (CollisionEvent[]) collisions.toArray(new CollisionEvent[0]);
+	}
 	
 	/**
 	 * Get the total energy in the system
