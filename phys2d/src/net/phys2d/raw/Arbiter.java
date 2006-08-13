@@ -137,6 +137,24 @@ public strictfp class Arbiter {
 	public int getNumContacts() {
 		return numContacts;
 	}
+
+	/**
+	 * Get the first of the two bodies handled by this arbiter
+	 * 
+	 * @return The first of the two bodies handled by this arbiter
+	 */
+	public Body getBody1() {
+		return body1;
+	}
+	
+	/**
+	 * Get the second of the two bodies handled by this arbiter
+	 * 
+	 * @return The second of the two bodies handled by this arbiter
+	 */
+	public Body getBody2() {
+		return body2;
+	}
 	
 	/**
 	 * Update this arbiter from a second set of data determined
@@ -183,6 +201,16 @@ public strictfp class Arbiter {
 		numContacts = numNewContacts;
 	}
 
+	/**
+	 * Check if this arbiter affects the specified body
+	 * 
+	 * @param body The body to check for
+	 * @return True if this arbiter effects the body
+	 */
+	public boolean concerns(Body body) {
+		return (body1 == body) || (body2 == body);
+	}
+	
 	/**
 	 * Apply the friction impulse from each contact.
 	 * 
