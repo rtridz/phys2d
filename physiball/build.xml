@@ -1,0 +1,59 @@
+<project name="physiball" default="webstart-build" basedir=".">
+
+<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+<target name="init">
+	<!-- Deployment Server -->
+	<property name="build.dir" value="target"/>
+	<property name="username" value="kevin"/>
+	<property name="host" value="bob.newdawnsoftware.com"/>
+	<property name="dir" value="/home/kevin/public_html/cokeandcode.com/physiball"/>
+	<property name="httpsrc" value="http://www.cokeandcode.com/physiball"/>
+	
+	<property name="keystore" value="conf/keystore.ks"/>
+	<property name="alias" value="KevinGlass"/>
+	
+    <!-- Initialise -->
+	<delete dir="${build.dir}"/>
+	<mkdir dir="${build.dir}/classes"/>
+	
+	<input message="Upload password:" addproperty="password"/>
+</target>
+
+<target name="compile" depends="init">
+	<!-- build util, should have no deps -->
+	<javac debug="true" srcdir="src" destdir="${build.dir}/classes" target="1.4" source="1.4">
+	    <classpath>
+	      <pathelement path="lib/lwjgl.jar"/>
+	      <pathelement path="lib/nd-render.jar"/>
+	      <pathelement path="lib/nd-util.jar"/>
+	      <pathelement path="lib/nd-glui.jar"/>
+	      <pathelement path="lib/nd-sound.jar"/>
+	      <pathelement path="lib/jogg-0.0.7.jar"/>
+	      <pathelement path="lib/jorbis-0.0.15.jar"/>
+	      <pathelement path="lib/phys2d.jar"/>
+	    </classpath>
+	</javac>
+	<jar destfile="lib/physiball.jar" 
+		 basedir="${build.dir}/classes"/>
+	<jar destfile="lib/physiball-res.jar" 
+		 basedir="." includes="res/**/**"/>
+		 
+	<signjar jar="lib/physiball.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/> 
+	<signjar jar="lib/physiball-res.jar" keystore="${keystore}" storepass="${password}" alias="${alias}"/>
+</target>
+
+<target name="webstart-build" depends="init, compile">
+	<scp todir="${username}:${password}@${host}:${dir}" 
+		 file="lib/physiball.jar"
+		 trust="true"
+		 port="122"
+		 verbose="true"/>
+	<scp todir="${username}:${password}@${host}:${dir}" 
+		 file="lib/physiball-res.jar"
+		 trust="true"
+		 port="122"
+		 verbose="true"/>
+</target>
+
+</project>
