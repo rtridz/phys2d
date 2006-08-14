@@ -11,8 +11,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.newdawn.glui.font.BitmapFont;
 import org.newdawn.render.texture.Texture;
 import org.newdawn.render.texture.TextureLoader;
+import org.newdawn.render.util.Color;
 import org.newdawn.render.util.Tuple4;
 import org.newdawn.render.window.LWJGLWindow;
 import org.newdawn.state.GameState;
@@ -45,6 +47,10 @@ public class InGameState implements GameState {
 	private Texture background;
 	private float maxSpeed = 7;
 	private float force = 4;
+	
+	private BitmapFont font;
+	private BitmapFont bigfont;
+	private String version = "0.1";
 	
 	public InGameState(LWJGLWindow window) {
 		this.window = window;
@@ -80,6 +86,9 @@ public class InGameState implements GameState {
 	 * @see org.newdawn.state.GameState#init(org.newdawn.state.StateBasedGame)
 	 */
 	public void init(StateBasedGame game) throws IOException {
+		font = new BitmapFont("res/new16.tga",16,16);
+		bigfont = new BitmapFont("res/font.tga","res/font.dat",32,32);
+		
 		background = TextureLoader.get().getTextureLinear("res/bricks.tga");
 		
 		level = new Level();
@@ -141,12 +150,16 @@ public class InGameState implements GameState {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glTranslatef(0,0,-15);
 		
+		float xo = player.getX();
+		float yo = player.getY();
+		
 		float width = 10;
 		float height = 10;
 		float xscale = 0.5f;
 		float yscale = 0.5f;
-		float tx = player.getX() * xscale;
-		float ty = player.getY() * yscale;
+		float tx = xo * xscale;
+		float ty = yo * yscale;
+		
 		background.bind();
 		GL11.glBegin(GL11.GL_QUADS);
 			GL11.glNormal3f(0,0,1);
@@ -160,10 +173,23 @@ public class InGameState implements GameState {
 			GL11.glVertex3f(-width,height,-0.55f);
 		GL11.glEnd();
 
-		GL11.glTranslatef(-player.getX(),-player.getY()-1,0);
+		GL11.glTranslatef(-xo,-yo-1,0);
 		current.render();
+		
+		window.enterOrtho();
+		GL11.glEnable(GL11.GL_BLEND);
+		drawString(10,window.getHeight() - 50,"PhysiBall v"+version+" Java, OpenGL and 2D Physics");
+		drawString(10,window.getHeight() - 30,"Kevin Glass (demo@cokeandcode.com)");
+		drawString(10,window.getHeight() - 10,"http://www.cokeandcode.com");
+		drawString(10,30,"FPS: "+window.getFPS());
+		window.leaveOrtho();
 	}
 
+	private void drawString(int x, int y, String str) {
+		font.drawString(x+1,y+1,str, Color.black);
+		font.drawString(x,y,str, Color.white);
+	}
+	
 	/**
 	 * @see org.newdawn.state.GameState#update(org.newdawn.state.StateBasedGame, int)
 	 */

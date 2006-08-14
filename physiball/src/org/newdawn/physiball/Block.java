@@ -77,7 +77,7 @@ public class Block extends Entity {
 		GL11.glTranslatef(xp,yp,0);
 		GL11.glRotatef(rotation,0,0,1);
 		texture.bind();
-		
+
 		GL11.glCallList(list);
 		
 		enterOutline();
@@ -98,7 +98,7 @@ public class Block extends Entity {
 	 * @see org.newdawn.physiball.Entity#init()
 	 */
 	public void init() throws IOException {
-		texture = TextureLoader.get().getTextureLinear("res/crate.tga");
+		texture = TextureLoader.get().getTextureMipMap("res/crate.tga");
 	
 		list = GL11.glGenLists(1);
 		float w2 = width / 2;
