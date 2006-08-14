@@ -72,6 +72,26 @@ public strictfp class Line extends AbstractShape {
 	/** Temporary storage - declared globally to reduce GC */
 	private Vector2f other = new Vector2f(0,0);
 
+	/** True if this line blocks on the outer edge */
+	private boolean outerEdge = true;
+	/** True if this line blocks on the inner edge */
+	private boolean innerEdge = true;
+	
+	/**
+	 * Create a new line based on the origin and a single point
+	 * 
+	 * @param x The end point of the line
+	 * @param y The end point of the line
+	 * @param inner True if this line blocks on it's inner edge
+	 * @param outer True if this line blocks on it's outer edge
+	 */
+	public Line(float x, float y, boolean inner, boolean outer) {
+		this(0,0,x,y);
+		
+		setBlocksInnerEdge(inner);
+		setBlocksOuterEdge(outer);
+	}
+
 	/**
 	 * Create a new line based on the origin and a single point
 	 * 
@@ -79,7 +99,7 @@ public strictfp class Line extends AbstractShape {
 	 * @param y The end point of the line
 	 */
 	public Line(float x, float y) {
-		this(0,0,x,y);
+		this(x,y,true,true);
 	}
 	
 	/**
@@ -122,6 +142,42 @@ public strictfp class Line extends AbstractShape {
 		bounds = new AABox(xoffset,yoffset,width,height);
 		
 		set(start,end);
+	}
+	
+	/**
+	 * Check if this line blocks the inner side (for want of a better term)
+	 * 
+	 * @return True if this line blocks the inner side
+	 */
+	public boolean blocksInnerEdge() {
+		return innerEdge;
+	}
+	
+	/**
+	 * Indicate if this line blocks on it's inner edge
+	 * 
+	 * @param innerEdge True if this line blocks on it's inner edge
+	 */
+	public void setBlocksInnerEdge(boolean innerEdge) {
+		this.innerEdge = innerEdge;
+	}
+
+	/**
+	 * Check if this line blocks the outer side (for want of a better term)
+	 * 
+	 * @return True if this line blocks the outer side
+	 */
+	public boolean blocksOuterEdge() {
+		return outerEdge;
+	}
+
+	/**
+	 * Indicate if this line blocks on it's outer edge
+	 * 
+	 * @param outerEdge True if this line blocks on it's outer edge
+	 */
+	public void setBlocksOuterEdge(boolean outerEdge) {
+		this.outerEdge = outerEdge;
 	}
 	
 	/**
