@@ -49,7 +49,7 @@ public class Ball extends Entity {
 			body = new Body(new Circle(radius),mass);
 		}
 		body.setPosition(x,y);
-		body.setRestitution(0);
+		body.setRestitution(0.4f);
 		body.setFriction(1f);
 		body.setRotation(0.5f);
 	}

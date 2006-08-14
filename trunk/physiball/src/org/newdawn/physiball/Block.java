@@ -47,7 +47,7 @@ public class Block extends Entity {
 			body = new Body(new Box(width,height),mass);
 		}
 		body.setPosition(x,y);
-		body.setRestitution(0.2f);
+		body.setRestitution(0.4f);
 	}
 
 	public float getX() {
