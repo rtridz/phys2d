@@ -43,7 +43,8 @@ public class InGameState implements GameState {
 	private boolean onground;
 	private int count = 0;
 	private Texture background;
-	private float maxSpeed = 5;
+	private float maxSpeed = 7;
+	private float force = 4;
 	
 	public InGameState(LWJGLWindow window) {
 		this.window = window;
@@ -182,12 +183,12 @@ public class InGameState implements GameState {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
 			if (player.getBody().getVelocity().getX() > -maxSpeed) {
-				player.apply(-3,0);
+				player.apply(-force,0);
 			}
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
 			if (player.getBody().getVelocity().getX() < maxSpeed) {
-				player.apply(3,0);
+				player.apply(force,0);
 			}
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {

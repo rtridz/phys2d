@@ -196,15 +196,17 @@ public class Area extends Entity {
 			Point pt = (Point) points.get(i);
 			Point pt2 = (Point) points.get(i+1);
 			
-			StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y));
+			StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y,true,false));
 			body.setPosition(pt.x,pt.y);
+			body.setRestitution(0.4f);
 			world.add(body);
 		}
 		
 		Point pt = (Point) points.get(points.size()-1);
 		Point pt2 = (Point) points.get(0);
-		StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y));
+		StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y,true,false));
 		body.setPosition(pt.x,pt.y);
+		body.setRestitution(0.4f);
 		world.add(body);
 	}
 
