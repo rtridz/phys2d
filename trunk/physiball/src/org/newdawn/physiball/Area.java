@@ -79,7 +79,7 @@ public class Area extends Entity {
 	 * @see org.newdawn.physiball.Entity#init()
 	 */
 	public void init() throws IOException {
-		texture = TextureLoader.get().getTextureLinear("res/crazy.tga");
+		texture = TextureLoader.get().getTextureMipMap("res/crazy.tga");
 		
 		list = GL11.glGenLists(1);
 		float scale = 0.5f;
