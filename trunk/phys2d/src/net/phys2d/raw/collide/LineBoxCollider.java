@@ -118,7 +118,7 @@ public strictfp class LineBoxCollider implements Collider {
 			pts[i].projectOntoUnit(lineVec, res);
 			proj[i] = getProp(res, new Vector2f(line.getDX(), line.getDY()));
 			
-			if ((proj[i] > 1) || (proj[i] < 0)) {
+			if ((proj[i] >= 1) || (proj[i] <= 0)) {
 				outOfRange++;
 			}
 		}
@@ -129,6 +129,10 @@ public strictfp class LineBoxCollider implements Collider {
 		Vector2f normal = new Vector2f(axis);
 		
 		if (centre < linePos) {
+			if (!line.blocksInnerEdge()) {
+				return 0;
+			}
+			
 			normal.scale(-1);
 			for (int i=0;i<4;i++) {
 				if (tangent[i] > linePos) {
@@ -180,6 +184,10 @@ public strictfp class LineBoxCollider implements Collider {
 				}
 			}
 		} else {
+			if (!line.blocksOuterEdge()) {
+				return 0;
+			}
+			
 			for (int i=0;i<4;i++) {
 				if (tangent[i] < linePos) {
 					if (proj[i] < 0) {
