@@ -2,8 +2,8 @@ package org.newdawn.physiball;
 
 import java.io.IOException;
 
+import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
-import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.AABox;
 import net.phys2d.raw.shapes.Box;
@@ -17,41 +17,32 @@ import org.newdawn.render.texture.TextureLoader;
  * 
  * @author Kevin Glass
  */
-public class Block extends Entity {
+public class MovingBlock extends Entity {
 	private float startx;
 	private float starty;
 	private float width;
 	private float height;
-	private boolean fixed;
-	private float mass;
 	
 	private int list;
 	private Texture texture;
 	private Body body;
-	private float rest;
-	private boolean tracked;
+	private int interval = 8250;
+	private int waitInterval = 4000;
+	private int count;
+	private int waitCount;
+	private float speed = 1;
+	private Body anchor;
 	
-	public Block(float x,float y,float width,float height,float mass, boolean fixed,float rest,boolean tracked) {
-		this.tracked = tracked;
+	public MovingBlock(float x,float y,float width,float height) {
 		this.startx = x;
 		this.starty = y;
 		this.width = width;
 		this.height = height;
-		this.fixed = fixed;
-		this.mass = mass;
-		this.rest = rest;
 		
-		if (fixed) {
-			body = new StaticBody(new Box(width * Level.SCALE_UP,height * Level.SCALE_UP));
-		} else {
-			body = new Body(new Box(width * Level.SCALE_UP,height * Level.SCALE_UP),mass);
-		}
+		body = new Body(new Box(width * Level.SCALE_UP,height * Level.SCALE_UP), 100000);
 		body.setPosition(x * Level.SCALE_UP,y * Level.SCALE_UP);
-		body.setRestitution(rest);
-		body.setFriction(0.5f);
-		if (tracked) {
-			InGameState.addTrackedBody(body);
-		}
+		body.setRestitution(0);
+		body.setGravityEffected(false);
 	}
 
 	public float getX() {
@@ -70,29 +61,47 @@ public class Block extends Entity {
 	}
 
 	public void render() {
-		float rotation = (float) Math.toDegrees(body.getRotation());
+		float rotation = 0;
 		
 		float xp = body.getPosition().getX();
 		float yp = body.getPosition().getY();
 		
+		xp = Math.round(xp);
+		yp = Math.round(yp);
+		
 		xp /= Level.SCALE_UP;
 		yp /= Level.SCALE_UP;
 		
-		GL11.glPushMatrix();
 		GL11.glTranslatef(xp,yp,0);
 		GL11.glRotatef(rotation,0,0,1);
-		GL11.glScalef(1,1,2);
 		texture.bind();
 
 		GL11.glCallList(list);
 		
-		GL11.glPopMatrix();
+		GL11.glRotatef(-rotation,0,0,1);
+		GL11.glTranslatef(-xp,-yp,0);
 	}
 
 	/**
 	 * @see org.newdawn.physiball.Entity#update(int)
 	 */
 	public void update(int delta) {
+		if (count < 0) {
+			body.adjustVelocity(new Vector2f(body.getVelocity()).negate());
+			waitCount -= delta;
+			
+			if (waitCount < 0) {
+				speed = -speed;
+				count = interval;
+				waitCount = waitInterval;
+			}
+		} else {
+			body.addForce(new Vector2f(0,body.getMass() * speed * Level.SCALE_UP * 0.1f));
+			body.setRotation(0);
+			count -= delta;
+		}
+		
+		System.out.println(body);
 	}
 
 	/**
@@ -100,8 +109,7 @@ public class Block extends Entity {
 	 */
 	public void init() throws IOException {
 		texture = TextureLoader.get().getTextureMipMap("res/crate.tga");
-		float ep = 0.01f;
-		
+	
 		list = GL11.glGenLists(1);
 		float w2 = width / 2;
 		float h2 = height / 2;
@@ -109,13 +117,23 @@ public class Block extends Entity {
 			GL11.glBegin(GL11.GL_QUADS);
 				GL11.glNormal3f(0,0,1);
 				GL11.glTexCoord2f(0,0);
-				GL11.glVertex3f(-w2,-h2,0.5f+ep);
+				GL11.glVertex3f(-w2,-h2,0.5f);
 				GL11.glTexCoord2f(width,0);
-				GL11.glVertex3f(w2,-h2,0.5f+ep);
+				GL11.glVertex3f(w2,-h2,0.5f);
 				GL11.glTexCoord2f(width,height);
-				GL11.glVertex3f(w2,h2,0.5f+ep);
+				GL11.glVertex3f(w2,h2,0.5f);
 				GL11.glTexCoord2f(0,height);
-				GL11.glVertex3f(-w2,h2,0.5f+ep);
+				GL11.glVertex3f(-w2,h2,0.5f);
+				
+				GL11.glNormal3f(0,0,-1);
+				GL11.glTexCoord2f(0,0);
+				GL11.glVertex3f(-w2,-h2,-0.5f);
+				GL11.glTexCoord2f(0,height);
+				GL11.glVertex3f(-w2,h2,-0.5f);
+				GL11.glTexCoord2f(width,height);
+				GL11.glVertex3f(w2,h2,-0.5f);
+				GL11.glTexCoord2f(width,0);
+				GL11.glVertex3f(w2,-h2,-0.5f);
 				
 				GL11.glNormal3f(0,-1,0);
 				GL11.glTexCoord2f(0,0);
@@ -168,7 +186,7 @@ public class Block extends Entity {
 	 * @see org.newdawn.physiball.Entity#copy()
 	 */
 	public Entity copy() {
-		Block copy = new Block(startx,starty,width,height,mass,fixed,rest,tracked);
+		MovingBlock copy = new MovingBlock(startx,starty,width,height);
 		copy.list = list;
 		copy.texture = texture;
 		copy.body.setRotation(body.getRotation());

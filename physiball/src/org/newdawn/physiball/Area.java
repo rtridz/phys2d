@@ -223,6 +223,7 @@ public class Area extends Entity {
 		StaticBody body = new StaticBody(new Line(dx,dy,true,false));
 		body.setPosition(px,py);
 		body.setRestitution(0.4f);
+		body.setFriction(0.5f);
 		
 		return body;
 	}

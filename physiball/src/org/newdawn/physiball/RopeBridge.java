@@ -27,15 +27,15 @@ public class RopeBridge extends Entity {
 		this.width = width;
 		this.segments = segments;
 	
-		left = new Block(x-(width/2)-0.5f,y-0.25f,0.5f,1f,0,true,0.4f);
-		right = new Block(x+(width/2)+0.5f,y-0.25f,0.5f,1f,0,true,0.4f);
+		left = new Block(x-(width/2)-0.5f,y-0.25f,0.5f,1f,0,true,0.4f,false);
+		right = new Block(x+(width/2)+0.5f,y-0.25f,0.5f,1f,0,true,0.4f,false);
 	
 		float segmentSize = width / segments;
 		float blockSize = segmentSize - 0.2f;
 	
 		blocks = new Block[segments];
 		for (int i=0;i<segments;i++) {
-			blocks[i] = new Block(x-(width/2)+(i*segmentSize)+(segmentSize/2),y,blockSize,0.3f,0.5f,false,0.1f);
+			blocks[i] = new Block(x-(width/2)+(i*segmentSize)+(segmentSize/2),y,blockSize,0.3f,0.5f,false,0.1f,false);
 		}
 	}
 	

@@ -25,8 +25,8 @@ public class Teeter extends Entity {
 		this.y = y;
 		this.width = width;
 		
-		top = new Block(x,y,width,0.2f,1,false,0);
-		pivot = new Block(x,y-1,0.5f,0.5f,0,true,0);
+		top = new Block(x,y,width,0.2f,1,false,0,false);
+		pivot = new Block(x,y-1,0.5f,0.5f,0,true,0,false);
 	}
 	
 	/**
