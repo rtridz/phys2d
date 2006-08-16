@@ -93,7 +93,7 @@ public strictfp class LineBoxCollider implements Collider {
 		Box box = (Box) bodyB.getShape();
 		
 		Vector2f lineVec = new Vector2f(line.getDX(), line.getDY());
-		lineVec.normalise();
+		lineVec.normalise();	
 		Vector2f axis = new Vector2f(-line.getDY(), line.getDX());
 		axis.normalise();
 		
@@ -147,7 +147,7 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left >= 0) && (right >= 0)) {
+						if ((left > 0) && (right > 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getStart());
 							
@@ -165,7 +165,7 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left >= 0) && (right >= 0)) {
+						if ((left > 0) && (right > 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getEnd());
 
@@ -201,7 +201,7 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left <= 0) && (right <= 0)) {
+						if ((left < 0) && (right < 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getStart());
 
@@ -219,7 +219,7 @@ public strictfp class LineBoxCollider implements Collider {
 						res.projectOntoUnit(axis, onAxis);
 						float right = getProp(onAxis, axis);
 						
-						if ((left <= 0) && (right <= 0)) {
+						if ((left < 0) && (right < 0)) {
 							Vector2f pos = new Vector2f(bodyA.getPosition());
 							pos.add(line.getEnd());
 

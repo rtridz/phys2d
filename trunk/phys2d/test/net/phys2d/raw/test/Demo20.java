@@ -45,6 +45,7 @@ import net.phys2d.raw.Body;
 import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Box;
+import net.phys2d.raw.shapes.Circle;
 import net.phys2d.raw.shapes.Line;
 
 /**
@@ -71,11 +72,23 @@ public class Demo20 extends AbstractDemo {
 		body1.setPosition(400, 300);
 		world.add(body1);
 		Body body3 = new StaticBody("Ground2", new Line(0,50, false, true));
-		body3.setPosition(100, 300);
+		body3.setPosition(100, 301);
 		world.add(body3);
 		
 		body2 = new Body("Mover1", new Box(40,40), 10.0f);
-		body2.setPosition(200.0f, 280.0f);
+		body2.setPosition(150.0f, 280.0f);
+		world.add(body2);
+		body2 = new Body("Mover1", new Box(40,40), 10.0f);
+		body2.setPosition(190.0f, 280.0f);
+		world.add(body2);
+		body2 = new Body("Mover1", new Box(40,40), 10.0f);
+		body2.setPosition(230.0f, 280.0f);
+		world.add(body2);
+		body2 = new Body("Mover1", new Box(40,40), 10.0f);
+		body2.setPosition(280.0f, 280.0f);
+		world.add(body2);
+		body2 = new Body("Mover1", new Circle(20), 10.0f);
+		body2.setPosition(380.0f, 280.0f);
 		world.add(body2);
 	}
 	
