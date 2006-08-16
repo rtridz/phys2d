@@ -182,16 +182,15 @@ public strictfp class World extends CollisionSpace {
 		{
 			Body b = bodies.get(i);
 
-			if (!b.getGravityEffected()) {
-				continue;
-			}
 			if (b.getInvMass() == 0.0f) {
 				continue;
 			}
-			
+
 			Vector2f temp = new Vector2f(b.getForce());
 			temp.scale(b.getInvMass());
-			temp.add(gravity);
+			if (b.getGravityEffected()) {
+				temp.add(gravity);
+			}
 			temp.scale(dt);
 			
 			b.adjustVelocity(temp);
@@ -220,7 +219,7 @@ public strictfp class World extends CollisionSpace {
 				j.applyImpulse();
 			}
 		}
-
+		
 		for (int i=0;i < bodies.size(); ++i)
 		{
 			Body b = bodies.get(i);
