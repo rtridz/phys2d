@@ -75,7 +75,6 @@ public class Block extends Entity {
 		
 		xp = Math.round(xp);
 		yp = Math.round(yp);
-		rotation = Math.round(rotation);
 		
 		xp /= Level.SCALE_UP;
 		yp /= Level.SCALE_UP;

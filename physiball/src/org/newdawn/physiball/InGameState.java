@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import net.phys2d.math.Vector2f;
+import net.phys2d.raw.BasicJoint;
 import net.phys2d.raw.CollisionEvent;
+import net.phys2d.raw.Joint;
 import net.phys2d.raw.World;
 
 import org.lwjgl.BufferUtils;
@@ -112,6 +114,23 @@ public class InGameState implements GameState {
 		block = new Block(11,0.5f,10,1f,0,true,0.4f);
 		block.getBody().setRotation(0.5f);
 		level.addEntity(block);
+		block = new Block(-21,3,10,1,0,true,0.4f);
+		level.addEntity(block);
+		block = new Block(-40,3,10,1,0,true,0.4f);
+		level.addEntity(block);
+		
+		// teeter
+		Teeter t = new Teeter(-30.5f,4.5f,12);
+		level.addEntity(t);
+		block = new Block(-34f,10f,1f,1f,0.5f,false,0.2f);
+		level.addEntity(block);
+		
+		block = new Block(21,3,10,1,0,true,0.4f);
+		level.addEntity(block);
+		block = new Block(41,3,10,1,0,true,0.4f);
+		level.addEntity(block);
+		RopeBridge bridge = new RopeBridge(31f,4.25f,11,8);
+		level.addEntity(bridge);
 		
 		for (int y=0;y<3;y++) {
 			for (int x=0;x<y+1;x++) {
@@ -129,8 +148,8 @@ public class InGameState implements GameState {
 
 	private void restart() {
 		controls = 5000;
-		current = level.copy();
 		try {
+			current = level.copy();
 			player = new Ball(0,0,0.5f,1,false);
 			player.init();
 			current.addEntity(player);
@@ -244,6 +263,7 @@ public class InGameState implements GameState {
 				player.apply(force,0);
 			}
 		}
+		count--;
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
 			World world = current.getPhysicsWorld();
 			
@@ -265,12 +285,10 @@ public class InGameState implements GameState {
 			
 			if (onground) {
 				if (count <= 0) {
-					count = 1;
+					count = 30;
 					
 					player.getBody().adjustPosition(new Vector2f(0,sep));
 					player.getBody().adjustVelocity(new Vector2f(0,jump));
-				} else {
-					count--;
 				}
 			}
 		}

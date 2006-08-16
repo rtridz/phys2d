@@ -41,13 +41,14 @@ public class Level {
 		}
 	}
 	
-	public Level copy() {
+	public Level copy() throws IOException {
 		Level copy = new Level();
 		
 		for (int i=0;i<entities.size();i++) {
 			copy.addEntity(((Entity) entities.get(i)).copy());
 		}
 		
+		copy.init();
 		return copy;
 	}
 	
