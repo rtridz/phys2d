@@ -28,26 +28,28 @@ public class Block extends Entity {
 	private int list;
 	private Texture texture;
 	private Body body;
+	private float rest;
 	
-	public Block(float x,float y,float width,float height,float mass, boolean fixed) {
+	public Block(float x,float y,float width,float height,float mass, boolean fixed,float rest) {
 		this.startx = x;
 		this.starty = y;
 		this.width = width;
 		this.height = height;
 		this.fixed = fixed;
 		this.mass = mass;
+		this.rest = rest;
 		
 		scalex = 1f + (0.05f / width);
 		scaley = 1f + (0.05f / height);
 		scalez = 1.05f;
 		
 		if (fixed) {
-			body = new StaticBody(new Box(width,height));
+			body = new StaticBody(new Box(width * Level.SCALE_UP,height * Level.SCALE_UP));
 		} else {
-			body = new Body(new Box(width,height),mass);
+			body = new Body(new Box(width * Level.SCALE_UP,height * Level.SCALE_UP),mass);
 		}
-		body.setPosition(x,y);
-		body.setRestitution(0.4f);
+		body.setPosition(x * Level.SCALE_UP,y * Level.SCALE_UP);
+		body.setRestitution(rest);
 	}
 
 	public float getX() {
@@ -65,24 +67,24 @@ public class Block extends Entity {
 		return null;
 	}
 
-	/**
-	 * @see org.newdawn.physiball.Entity#render()
-	 */
 	public void render() {
 		float rotation = (float) Math.toDegrees(body.getRotation());
 		
 		float xp = body.getPosition().getX();
 		float yp = body.getPosition().getY();
 		
+		xp = Math.round(xp);
+		yp = Math.round(yp);
+		rotation = Math.round(rotation);
+		
+		xp /= Level.SCALE_UP;
+		yp /= Level.SCALE_UP;
+		
 		GL11.glTranslatef(xp,yp,0);
 		GL11.glRotatef(rotation,0,0,1);
 		texture.bind();
 
 		GL11.glCallList(list);
-		
-		enterOutline();
-		GL11.glCallList(list);
-		leaveOutline();
 		
 		GL11.glRotatef(-rotation,0,0,1);
 		GL11.glTranslatef(-xp,-yp,0);
@@ -145,7 +147,7 @@ public class Block extends Entity {
 				GL11.glTexCoord2f(0,1);
 				GL11.glVertex3f(-w2,h2,-0.5f);
 
-				GL11.glNormal3f(0,-1,0);
+				GL11.glNormal3f(-1,0,0);
 				GL11.glTexCoord2f(1,1);
 				GL11.glVertex3f(-w2,h2,0.5f);
 				GL11.glTexCoord2f(0,1);
@@ -155,7 +157,7 @@ public class Block extends Entity {
 				GL11.glTexCoord2f(1,0);
 				GL11.glVertex3f(-w2,-h2,0.5f);
 				
-				GL11.glNormal3f(0,1,0);
+				GL11.glNormal3f(1,0,0);
 				GL11.glTexCoord2f(1,1);
 				GL11.glVertex3f(w2,h2,0.5f);
 				GL11.glTexCoord2f(1,0);
@@ -164,7 +166,6 @@ public class Block extends Entity {
 				GL11.glVertex3f(w2,-h2,-0.5f);
 				GL11.glTexCoord2f(0,1);
 				GL11.glVertex3f(w2,h2,-0.5f);
-				
 			GL11.glEnd();
 		GL11.glEndList();
 	}
@@ -177,7 +178,7 @@ public class Block extends Entity {
 	 * @see org.newdawn.physiball.Entity#copy()
 	 */
 	public Entity copy() {
-		Block copy = new Block(startx,starty,width,height,mass,fixed);
+		Block copy = new Block(startx,starty,width,height,mass,fixed,rest);
 		copy.list = list;
 		copy.texture = texture;
 		copy.body.setRotation(body.getRotation());

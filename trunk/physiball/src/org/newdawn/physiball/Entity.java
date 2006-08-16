@@ -39,13 +39,15 @@ public abstract class Entity {
 		GL11.glColor3f(0,0,0f);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glCullFace(GL11.GL_FRONT);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glPolygonMode(GL11.GL_BACK,GL11.GL_LINE);
-		GL11.glLineWidth(2.0f);
+		GL11.glScalef(scalex,scaley,scalez);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
 	}
 	
 	protected void leaveOutline() {
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(true);
+		GL11.glScalef(1/scalex,1/scaley,1/scalez);
 		GL11.glColor3f(1,1,1);
 		GL11.glCullFace(GL11.GL_BACK);
 		GL11.glEnable(GL11.GL_LIGHTING);

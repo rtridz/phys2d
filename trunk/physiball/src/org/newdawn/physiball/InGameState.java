@@ -34,7 +34,7 @@ public class InGameState implements GameState {
 	private FloatBuffer mcolor2 = BufferUtils.createFloatBuffer(4);
 	private FloatBuffer pos1 = new Tuple4(0.5f,0.1f,0.5f,0).toFloatBuffer();
 	private FloatBuffer spec1 = new Tuple4(0.2f,0.2f,0.2f,1).toFloatBuffer();
-	private FloatBuffer pos2 = new Tuple4(-0.5f,0.1f,0.5f,0).toFloatBuffer();
+	private FloatBuffer pos2 = new Tuple4(-0.5f,0.1f,-0.5f,0).toFloatBuffer();
 	private FloatBuffer spec2 = new Tuple4(0.2f,0.2f,0.2f,1).toFloatBuffer();
 	
 	private LWJGLWindow window;
@@ -45,12 +45,15 @@ public class InGameState implements GameState {
 	private boolean onground;
 	private int count = 0;
 	private Texture background;
-	private float maxSpeed = 7;
-	private float force = 4;
+	private float maxSpeed = 7 * Level.SCALE_UP;
+	private float force = 4 * Level.SCALE_UP;
+	private float sep = 0.1f * Level.SCALE_UP;
+	private float jump = 7 * Level.SCALE_UP;
 	
 	private BitmapFont font;
 	private BitmapFont bigfont;
 	private String version = "0.1";
+	private int controls;
 	
 	public InGameState(LWJGLWindow window) {
 		this.window = window;
@@ -102,17 +105,17 @@ public class InGameState implements GameState {
 		area.addPoint(30,-6);
 		level.addEntity(area);
 		
-		level.addEntity(new Block(0,-2,10,1f,0,true));
-		Block block = new Block(-11,0.5f,10,1f,0,true);
+		level.addEntity(new Block(0,-2,10,1f,0,true,0.4f));
+		Block block = new Block(-11,0.5f,10,1f,0,true,0.4f);
 		block.getBody().setRotation(-0.5f);
 		level.addEntity(block);
-		block = new Block(11,0.5f,10,1f,0,true);
+		block = new Block(11,0.5f,10,1f,0,true,0.4f);
 		block.getBody().setRotation(0.5f);
 		level.addEntity(block);
 		
 		for (int y=0;y<3;y++) {
 			for (int x=0;x<y+1;x++) {
-				block = new Block(-40+(x*1)-(y*0.4f),-2-y,1,1f,1,false);
+				block = new Block(-40+(x*1)-(y*0.5f),-1-y,1,1f,1,false,0);
 				level.addEntity(block);
 			}
 		}
@@ -125,6 +128,7 @@ public class InGameState implements GameState {
 	}
 
 	private void restart() {
+		controls = 5000;
 		current = level.copy();
 		try {
 			player = new Ball(0,0,0.5f,1,false);
@@ -149,16 +153,23 @@ public class InGameState implements GameState {
 		GL11.glLoadIdentity();
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glTranslatef(0,0,-15);
+		GL11.glColor3f(1,1,1);
 		
-		float xo = player.getX();
-		float yo = player.getY();
+		float xp = player.getX();
+		float yp = player.getY();
+
+		xp = Math.round(xp);
+		yp = Math.round(yp);
+		
+		xp /= Level.SCALE_UP;
+		yp /= Level.SCALE_UP;
 		
 		float width = 10;
 		float height = 10;
 		float xscale = 0.5f;
 		float yscale = 0.5f;
-		float tx = xo * xscale;
-		float ty = yo * yscale;
+		float tx = xp * xscale;
+		float ty = yp * yscale;
 		
 		background.bind();
 		GL11.glBegin(GL11.GL_QUADS);
@@ -173,15 +184,22 @@ public class InGameState implements GameState {
 			GL11.glVertex3f(-width,height,-0.55f);
 		GL11.glEnd();
 
-		GL11.glTranslatef(-xo,-yo-1,0);
+		GL11.glTranslatef(-xp,-yp-1,0);
 		current.render();
 		
 		window.enterOrtho();
 		GL11.glEnable(GL11.GL_BLEND);
-		drawString(10,window.getHeight() - 50,"PhysiBall v"+version+" Java, OpenGL and 2D Physics");
+		drawString(10,window.getHeight() - 50,"PhysiBall v"+version+" Java, OpenGL (LWJGL) and 2D Physics");
 		drawString(10,window.getHeight() - 30,"Kevin Glass (demo@cokeandcode.com)");
 		drawString(10,window.getHeight() - 10,"http://www.cokeandcode.com");
 		drawString(10,30,"FPS: "+window.getFPS());
+		
+		if (controls > 0) {
+			drawString((window.getHeight() / 2) - 180, "Welcome to the PhysiBall Demo");
+			drawString((window.getHeight() / 2) - 130, "Use the cursors to move the ball left and right.");
+			drawString((window.getHeight() / 2) - 110, "Press Space to jump. Press R to restart.");
+			drawString((window.getHeight() / 2) - 60, "Java, OpenGL (LWJGL) and Physics in action!");
+		}
 		window.leaveOrtho();
 	}
 
@@ -189,11 +207,20 @@ public class InGameState implements GameState {
 		font.drawString(x+1,y+1,str, Color.black);
 		font.drawString(x,y,str, Color.white);
 	}
+
+	private void drawString(int y, String str) {
+		int x = (window.getWidth() - font.getWidth(str)) / 2;
+		drawString(x,y,str);
+	}
 	
 	/**
 	 * @see org.newdawn.state.GameState#update(org.newdawn.state.StateBasedGame, int)
 	 */
 	public void update(StateBasedGame game, int delta) {
+		if (controls >= 0) {
+			controls -= delta;
+		}
+		
 		current.update(delta);
 		
 		while (Keyboard.next()) {
@@ -238,11 +265,10 @@ public class InGameState implements GameState {
 			
 			if (onground) {
 				if (count <= 0) {
-					count = 10;
-					float sep = 0.1f;
+					count = 1;
 					
 					player.getBody().adjustPosition(new Vector2f(0,sep));
-					player.getBody().adjustVelocity(new Vector2f(0,7));
+					player.getBody().adjustVelocity(new Vector2f(0,jump));
 				} else {
 					count--;
 				}

@@ -12,13 +12,15 @@ import net.phys2d.raw.World;
  * @author Kevin Glass
  */
 public class Level {
+	public static final float SCALE_UP = 1000;
+	
 	private ArrayList entities = new ArrayList();
 	private World world;
 	private int worldUpdateInterval = 1000 / 60;
 	private int counter;
 	
 	public Level() {
-		world = new World(new Vector2f(0,-10), 10);
+		world = new World(new Vector2f(0,-10 * SCALE_UP), 10);
 		world.setDamping(0.95f);
 	}
 	
