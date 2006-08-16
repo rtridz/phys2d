@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.phys2d.math.Vector2f;
+import net.phys2d.raw.Body;
 import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.AABox;
@@ -63,12 +64,8 @@ public class Area extends Entity {
 		texture.bind();
 
 		GL11.glCallList(list);
-		
-		enterOutline();
-		GL11.glCallList(list);
-		leaveOutline();
 	}
-
+	
 	/**
 	 * @see org.newdawn.physiball.Entity#update(int)
 	 */
@@ -195,21 +192,40 @@ public class Area extends Entity {
 		for (int i=0;i<points.size()-1;i++) {
 			Point pt = (Point) points.get(i);
 			Point pt2 = (Point) points.get(i+1);
-			
-			StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y,true,false));
-			body.setPosition(pt.x,pt.y);
-			body.setRestitution(0.4f);
+
+			Body body = doPoint(pt,pt2);
 			world.add(body);
 		}
 		
 		Point pt = (Point) points.get(points.size()-1);
 		Point pt2 = (Point) points.get(0);
-		StaticBody body = new StaticBody(new Line(pt2.x-pt.x,pt2.y-pt.y,true,false));
-		body.setPosition(pt.x,pt.y);
-		body.setRestitution(0.4f);
+		
+		Body body = doPoint(pt,pt2);
 		world.add(body);
 	}
 
+	private Body doPoint(Point pt, Point pt2) {
+		pt = new Point(pt.x * Level.SCALE_UP, pt.y * Level.SCALE_UP);
+		pt2 = new Point(pt2.x * Level.SCALE_UP, pt2.y * Level.SCALE_UP);
+		
+		float scaleOff = 0.01f * Level.SCALE_UP;
+		
+		float dx = (pt2.x - pt.x);
+		float dy = (pt2.y - pt.y);
+		float len = (float) Math.sqrt((dx*dx)+(dy*dy));
+		
+		float ox = (dx / len) * scaleOff;
+		float oy = (dy / len) * scaleOff;
+		dx -= (ox * 2);
+		dy -= (oy * 2);
+		float px = pt.x + ox;
+		float py = pt.y + oy;
+		StaticBody body = new StaticBody(new Line(dx,dy,true,false));
+		body.setPosition(px,py);
+		body.setRestitution(0.4f);
+		
+		return body;
+	}
 	/**
 	 * @see org.newdawn.physiball.Entity#removeFromWorld(net.phys2d.raw.World)
 	 */

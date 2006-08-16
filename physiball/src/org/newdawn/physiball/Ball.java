@@ -44,11 +44,11 @@ public class Ball extends Entity {
 		scalez = 1f + (0.025f / radius);
 		
 		if (fixed) {
-			body = new StaticBody(new Circle(radius));
+			body = new StaticBody(new Circle(radius * Level.SCALE_UP));
 		} else {
-			body = new Body(new Circle(radius),mass);
+			body = new Body(new Circle(radius * Level.SCALE_UP),mass);
 		}
-		body.setPosition(x,y);
+		body.setPosition(x * Level.SCALE_UP, y * Level.SCALE_UP);
 		body.setRestitution(0.4f);
 		body.setFriction(1f);
 		body.setRotation(0.5f);
@@ -89,22 +89,25 @@ public class Ball extends Entity {
 
 		float xp = body.getPosition().getX();
 		float yp = body.getPosition().getY();
+
+		xp = Math.round(xp);
+		yp = Math.round(yp);
+		rotation = Math.round(rotation);
+		
+		xp /= Level.SCALE_UP;
+		yp /= Level.SCALE_UP;
 		
 		GL11.glTranslatef(xp,yp,0);
 		GL11.glRotatef(rotation,0,0,1);
 		GL11.glScalef(radius*2,radius*2,radius*2);
 		texture.bind();
 		
-		enterOutline();
-		model.render();
-		leaveOutline();
-		
 		model.render();
 		GL11.glScalef(1/(radius*2),1/(radius*2),1/(radius*2));	
 		GL11.glRotatef(-rotation,0,0,1);
 		GL11.glTranslatef(-xp,-yp,0);
 	}
-
+	
 	/**
 	 * @see org.newdawn.physiball.Entity#update(int)
 	 */
