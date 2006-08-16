@@ -2,11 +2,11 @@ package org.newdawn.physiball;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import net.phys2d.math.Vector2f;
-import net.phys2d.raw.BasicJoint;
+import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
-import net.phys2d.raw.Joint;
 import net.phys2d.raw.World;
 
 import org.lwjgl.BufferUtils;
@@ -29,6 +29,7 @@ import org.newdawn.util.Log;
  * @author Kevin Glass
  */
 public class InGameState implements GameState {
+	private static final boolean TRACKING = false;
 	public static final int ID = 1;
 
 	private FloatBuffer buffer = BufferUtils.createFloatBuffer(4);	
@@ -57,8 +58,14 @@ public class InGameState implements GameState {
 	private String version = "0.1";
 	private int controls;
 	
+	private static ArrayList trackedBodies = new ArrayList();
+	
 	public InGameState(LWJGLWindow window) {
 		this.window = window;
+	}
+	
+	public static void addTrackedBody(Body body) {
+		trackedBodies.add(body);
 	}
 	
 	private void configureLighting() {
@@ -103,44 +110,52 @@ public class InGameState implements GameState {
 		area.addPoint(-50,-5);
 		area.addPoint(-50,-6);
 		area.addPoint(-20,-8);
-		area.addPoint(30,-8);
-		area.addPoint(30,-6);
+		area.addPoint(30,-10);
+		area.addPoint(50,-10);
+		area.addPoint(70,-4);
+		area.addPoint(50,-6);
+		area.addPoint(48,-5);
+		area.addPoint(46,-6);
 		level.addEntity(area);
 		
-		level.addEntity(new Block(0,-2,10,1f,0,true,0.4f));
-		Block block = new Block(-11,0.5f,10,1f,0,true,0.4f);
+		level.addEntity(new StaticBall(30,-6,4));
+		
+		level.addEntity(new Block(0,-2,10,1f,0,true,0.4f,false));
+		Block block = new Block(-11,0.5f,10,1f,0,true,0.4f,false);
 		block.getBody().setRotation(-0.5f);
 		level.addEntity(block);
-		block = new Block(11,0.5f,10,1f,0,true,0.4f);
+		block = new Block(11,0.5f,10,1f,0,true,0.4f,false);
 		block.getBody().setRotation(0.5f);
 		level.addEntity(block);
-		block = new Block(-21,3,10,1,0,true,0.4f);
+		block = new Block(-21,3,10,1,0,true,0.4f,false);
 		level.addEntity(block);
-		block = new Block(-40,3,10,1,0,true,0.4f);
+		block = new Block(-40,3,10,1,0,true,0.4f,false);
 		level.addEntity(block);
+		
+//		MovingBlock b = new MovingBlock(-46,-4.875f,2,0.25f);
+//		level.addEntity(b);
 		
 		// teeter
 		Teeter t = new Teeter(-30.5f,4.5f,12);
 		level.addEntity(t);
-		block = new Block(-34f,10f,1f,1f,0.5f,false,0.2f);
+		block = new Block(-34f,10f,1f,1f,0.5f,false,0.2f,false);
 		level.addEntity(block);
 		
-		block = new Block(21,3,10,1,0,true,0.4f);
+		block = new Block(21,3,10,1,0,true,0.4f,false);
 		level.addEntity(block);
-		block = new Block(41,3,10,1,0,true,0.4f);
+		block = new Block(41,3,10,1,0,true,0.4f,false);
 		level.addEntity(block);
 		RopeBridge bridge = new RopeBridge(31f,4.25f,11,8);
 		level.addEntity(bridge);
 		
 		for (int y=0;y<3;y++) {
 			for (int x=0;x<y+1;x++) {
-				block = new Block(-40+(x*1)-(y*0.5f),-1-y,1,1f,1,false,0);
+				block = new Block(-40+(x*1)-(y*0.5f),-1-y,1,1f,1,false,0,y==2);
 				level.addEntity(block);
 			}
 		}
 		level.init();
 
-		
 		configureLighting();
 	
 		restart();
@@ -148,11 +163,13 @@ public class InGameState implements GameState {
 
 	private void restart() {
 		controls = 5000;
+		trackedBodies.clear();
 		try {
 			current = level.copy();
 			player = new Ball(0,0,0.5f,1,false);
 			player.init();
 			current.addEntity(player);
+			addTrackedBody(player.getBody());
 		} catch (IOException e) {
 			Log.log(e);
 			System.exit(0);
@@ -177,9 +194,6 @@ public class InGameState implements GameState {
 		float xp = player.getX();
 		float yp = player.getY();
 
-		xp = Math.round(xp);
-		yp = Math.round(yp);
-		
 		xp /= Level.SCALE_UP;
 		yp /= Level.SCALE_UP;
 		
@@ -218,6 +232,12 @@ public class InGameState implements GameState {
 			drawString((window.getHeight() / 2) - 130, "Use the cursors to move the ball left and right.");
 			drawString((window.getHeight() / 2) - 110, "Press Space to jump. Press R to restart.");
 			drawString((window.getHeight() / 2) - 60, "Java, OpenGL (LWJGL) and Physics in action!");
+		}
+		
+		if (TRACKING) {
+			for (int i=0;i<trackedBodies.size();i++) {
+				drawString(10,50+(i*20),i+" : "+((Body) trackedBodies.get(i)).getPosition());
+			}
 		}
 		window.leaveOrtho();
 	}
