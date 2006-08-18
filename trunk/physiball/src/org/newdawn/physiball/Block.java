@@ -48,7 +48,7 @@ public class Block extends Entity {
 		}
 		body.setPosition(x * Level.SCALE_UP,y * Level.SCALE_UP);
 		body.setRestitution(rest);
-		body.setFriction(0.1f);
+		body.setFriction(0.2f);
 		if (tracked) {
 			InGameState.addTrackedBody(body);
 		}
