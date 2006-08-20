@@ -50,7 +50,7 @@ import net.phys2d.math.Vector2f;
  */
 public strictfp class Arbiter {
 	/** The maximum number of points of contact */
-	public static final int MAX_POINTS = 2;
+	public static final int MAX_POINTS = 10;
 
 	/** The contacts being resolved by this arbiter */
 	private Contact[] contacts = new Contact[MAX_POINTS];
@@ -164,7 +164,10 @@ public strictfp class Arbiter {
 	 * @param numNewContacts The number of new contacts discovered
 	 */
 	void update(Contact[] newContacts, int numNewContacts) {
-		Contact[] mergedContacts = new Contact[] {new Contact(), new Contact()};
+		Contact[] mergedContacts = new Contact[MAX_POINTS];
+		for (int i=0;i<mergedContacts.length;i++) {
+			mergedContacts[i] = new Contact();
+		}
 		
 		for (int i = 0; i < numNewContacts; ++i)
 		{
