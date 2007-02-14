@@ -85,6 +85,15 @@ public class CollisionSpace implements CollisionContext {
 	 */
 	public void remove(Body body) {
 		bodies.remove(body);
+		
+		for (int i=0;i<arbiters.size();i++) {
+			Arbiter arb = arbiters.get(i);
+			
+			if ((arb.getBody1() == body) || (arb.getBody2() == body)) {
+				arbiters.remove(arb);
+				i--;
+			}
+		}
 	}
 	
 	/**
