@@ -63,6 +63,7 @@ import net.phys2d.raw.Contact;
 import net.phys2d.raw.FixedJoint;
 import net.phys2d.raw.Joint;
 import net.phys2d.raw.JointList;
+import net.phys2d.raw.SpringJoint;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Box;
 import net.phys2d.raw.shapes.Circle;
@@ -370,6 +371,29 @@ public abstract class AbstractDemo {
 		}
 		if (j instanceof BasicJoint) {
 			BasicJoint joint = (BasicJoint) j;
+			
+			Body b1 = joint.getBody1();
+			Body b2 = joint.getBody2();
+	
+			Matrix2f R1 = new Matrix2f(b1.getRotation());
+			Matrix2f R2 = new Matrix2f(b2.getRotation());
+	
+			ROVector2f x1 = b1.getPosition();
+			Vector2f p1 = MathUtil.mul(R1,joint.getLocalAnchor1());
+			p1.add(x1);
+	
+			ROVector2f x2 = b2.getPosition();
+			Vector2f p2 = MathUtil.mul(R2,joint.getLocalAnchor2());
+			p2.add(x2);
+	
+			g.setColor(Color.red);
+			g.drawLine((int) x1.getX(), (int) x1.getY(), (int) p1.x, (int) p1.y);
+			g.drawLine((int) p1.x, (int) p1.y, (int) x2.getX(), (int) x2.getY());
+			g.drawLine((int) x2.getX(), (int) x2.getY(), (int) p2.x, (int) p2.y);
+			g.drawLine((int) p2.x, (int) p2.y, (int) x1.getX(), (int) x1.getY());
+		}
+		if (j instanceof SpringJoint) {
+			SpringJoint joint = (SpringJoint) j;
 			
 			Body b1 = joint.getBody1();
 			Body b2 = joint.getBody2();
