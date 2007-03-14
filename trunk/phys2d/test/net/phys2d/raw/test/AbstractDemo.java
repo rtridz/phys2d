@@ -60,14 +60,12 @@ import net.phys2d.raw.BasicJoint;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.BodyList;
 import net.phys2d.raw.Contact;
+import net.phys2d.raw.SpringJoint;
 import net.phys2d.raw.FixedJoint;
 import net.phys2d.raw.Joint;
 import net.phys2d.raw.JointList;
-import net.phys2d.raw.SpringJoint;
 import net.phys2d.raw.World;
-import net.phys2d.raw.shapes.Box;
-import net.phys2d.raw.shapes.Circle;
-import net.phys2d.raw.shapes.Line;
+import net.phys2d.raw.shapes.*;
 import net.phys2d.raw.strategies.QuadSpaceStrategy;
 
 /**
@@ -289,6 +287,29 @@ public abstract class AbstractDemo {
 		if (body.getShape() instanceof Line) {
 			drawLineBody(g,body,(Line) body.getShape());
 		}
+		if (body.getShape() instanceof Polygon) {
+			drawPolygonBody(g,body,(Polygon) body.getShape());
+		}
+	}
+	
+	/**
+	 * Draw a polygon into the demo
+	 * 
+	 * @param g The graphics to draw the poly onto
+	 * @param body The body describing the poly's position
+	 * @param poly The poly to be drawn
+	 */
+	protected void drawPolygonBody(Graphics2D g, Body body, Polygon poly) {
+		g.setColor(Color.black);
+
+		ROVector2f[] verts = poly.getVertices(body.getPosition(), body.getRotation());
+		for ( int i = 0, j = verts.length-1; i < verts.length; j = i, i++ ) {			
+			g.drawLine(
+					(int) (0.5f + verts[i].getX()),
+					(int) (0.5f + verts[i].getY()), 
+					(int) (0.5f + verts[j].getX()),
+					(int) (0.5f + verts[j].getY()));
+		}
 	}
 
 	/**
@@ -300,13 +321,19 @@ public abstract class AbstractDemo {
 	 */
 	protected void drawLineBody(Graphics2D g, Body body, Line line) {
 		g.setColor(Color.black);
-
-		float x = body.getPosition().getX();
-		float y = body.getPosition().getY();
-		float dx = line.getDX();
-		float dy = line.getDY();
-		
-		g.drawLine((int) x,(int) y,(int) (x+dx),(int) (y+dy));
+//
+//		float x = body.getPosition().getX();
+//		float y = body.getPosition().getY();
+//		float dx = line.getDX();
+//		float dy = line.getDY();
+//		
+//		g.drawLine((int) x,(int) y,(int) (x+dx),(int) (y+dy));
+		Vector2f[] verts = line.getVertices(body.getPosition(), body.getRotation());
+		g.drawLine(
+				(int) verts[0].getX(),
+				(int) verts[0].getY(), 
+				(int) verts[1].getX(),
+				(int) verts[1].getY());
 	}
 	
 	/**
@@ -408,12 +435,11 @@ public abstract class AbstractDemo {
 			ROVector2f x2 = b2.getPosition();
 			Vector2f p2 = MathUtil.mul(R2,joint.getLocalAnchor2());
 			p2.add(x2);
-	
+			
 			g.setColor(Color.red);
 			g.drawLine((int) x1.getX(), (int) x1.getY(), (int) p1.x, (int) p1.y);
-			g.drawLine((int) p1.x, (int) p1.y, (int) x2.getX(), (int) x2.getY());
-			g.drawLine((int) x2.getX(), (int) x2.getY(), (int) p2.x, (int) p2.y);
-			g.drawLine((int) p2.x, (int) p2.y, (int) x1.getX(), (int) x1.getY());
+			g.drawLine((int) p1.x, (int) p1.y, (int) p2.getX(), (int) p2.getY());
+			g.drawLine((int) p2.getX(), (int) p2.getY(), (int) x2.getX(), (int) x2.getY());
 		}
 	}
 	

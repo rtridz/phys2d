@@ -67,5 +67,5 @@ public strictfp abstract class AbstractShape implements Shape {
 	 */
 	public AABox getBounds() {
 		return bounds;
-	}
+	}	
 }

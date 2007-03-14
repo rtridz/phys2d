@@ -201,4 +201,47 @@ public final strictfp class MathUtil {
 	{
 		return Math.max(low, Math.min(a, high));
 	}
+	
+
+	/**
+	 * Get the normal of a line x y (or edge). 
+	 * When standing on x facing y, the normal will point
+	 * to the left.
+	 * 
+	 * TODO: move this function somewhere else?
+	 * 
+	 * @param x startingpoint of the line
+	 * @param y endpoint of the line
+	 * @return a (normalised) normal
+	 */
+	public static Vector2f getNormal(ROVector2f x, ROVector2f y) {
+		Vector2f normal = new Vector2f(y);
+		normal.sub(x);
+		
+		normal = new Vector2f(normal.y, -normal.x);
+		normal.normalise();
+		
+		return normal;
+	}
+	
+//	public static Vector2f intersect(Vector2f startA, Vector2f endA, Vector2f startB, Vector2f endB) {				
+//		float d = (endB.y - startB.y) * (endA.x - startA.x) - (endB.x - startB.x) * (endA.y - startA.y);
+//		
+//		if ( d == 0 ) // parallel lines
+//			return null;
+//		
+//		float uA = (endB.x - startB.x) * (startA.y - startB.y) - (endB.y - startB.y) * (startA.x - startB.x);
+//		uA /= d;
+//		float uB = (endA.x - startA.x) * (startA.y - startB.y) - (endA.y - startA.y) * (startA.x - startB.x);
+//		uB /= d;
+//		
+//		if ( uA < 0 || uA > 1 || uB < 0 || uB > 1 ) 
+//			return null; // intersection point isn't between the start and endpoints
+//		
+//		return new Vector2f(
+//				startA.x + uA * (endA.x - startA.x),
+//				startA.y + uA * (endA.y - startA.y));
+//	}
+	
+	
 }

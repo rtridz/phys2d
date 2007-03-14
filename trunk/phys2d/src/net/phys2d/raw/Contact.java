@@ -50,9 +50,11 @@ import net.phys2d.raw.collide.FeaturePair;
  * @author Kevin Glass
  */
 public strictfp class Contact {
+	// TODO: the positions are absolute, right? if not make them so
 	/** The position of the contact */
 	Vector2f position = new Vector2f();
-	/** The normal at the contact point */
+	/** The normal at the contact point which, for convex bodies,
+	 * points away from the first body. */
 	Vector2f normal = new Vector2f();
 	/** ? */
 	float separation;
@@ -127,7 +129,7 @@ public strictfp class Contact {
 	}
 	
 	/**
-	 * Set the normal at the point of contact
+	 * Set the normal at the point of contact.
 	 * 
 	 * @param normal The normal at the point of contact
 	 */

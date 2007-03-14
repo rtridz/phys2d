@@ -53,25 +53,7 @@ import net.phys2d.raw.shapes.Line;
  * 
  * @author Kevin Glass
  */
-public strictfp class BoxCircleCollider implements Collider {
-	/** The single instance of this collider */
-	private static BoxCircleCollider single = new BoxCircleCollider();
-	
-	/**
-	 * Create/Get an instance of this collider
-	 * 
-	 * @return The new instance of this collider
-	 */
-	public static BoxCircleCollider createBoxCircleCollider() {
-		return single;
-	}
-	
-	/**
-	 * Prevent construction
-	 */
-	protected BoxCircleCollider() {	
-	}
-	
+public strictfp class BoxCircleCollider implements Collider {	
 	/**
 	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */

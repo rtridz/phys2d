@@ -167,6 +167,9 @@ public strictfp class Vector2f implements ROVector2f {
 	public void normalise() {
 		float l = length();
 		
+		if ( l == 0 )
+			return;
+		
 		x /= l;
 		y /= l;
 	}
@@ -219,5 +222,23 @@ public strictfp class Vector2f implements ROVector2f {
 		float dy = other.getY() - getY();
 		
 		return (float) Math.sqrt((dx*dx)+(dy*dy));
+	}
+	
+	/**
+	 * Compare two vectors allowing for a (small) error as indicated by the delta.
+	 * Note that the delta is used for the vector's components separately, i.e.
+	 * any other vector that is contained in the square box with sides 2*delta and this
+	 * vector at the center is considered equal. 
+	 *  
+	 * @param other The other vector to compare this one to
+	 * @param delta The allowed error
+	 * @return True iff this vector is equal to other, with a tolerance defined by delta
+	 */
+	public boolean equalsDelta(ROVector2f other, float delta) {
+		return (other.getX() - delta < x &&
+				other.getX() + delta > x &&
+				other.getY() - delta < y &&
+				other.getY() + delta > y );
+		
 	}
 }

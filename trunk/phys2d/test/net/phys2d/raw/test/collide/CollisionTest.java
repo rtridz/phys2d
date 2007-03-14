@@ -233,7 +233,7 @@ public class CollisionTest {
 		drawCircleBody(g, staticCircle, false);
 		drawLineBody(g, staticLine);
 		
-		BoxBoxCollider collider = BoxBoxCollider.create();
+		BoxBoxCollider collider = new BoxBoxCollider();
 		int count = collider.collide(contacts, staticBox, dynamicBox);
 		boolean hit1 = count > 0;
 		drawContacts(g, contacts, count);
@@ -249,15 +249,15 @@ public class CollisionTest {
 		g.setColor(new Color(0,1,0,0.5f));
 		drawBoxBody(g, dynamicBox, hit1 || hit2 || hit3);
 		
-		BoxCircleCollider collider2 = BoxCircleCollider.createBoxCircleCollider();
+		BoxCircleCollider collider2 = new BoxCircleCollider();
 		count = collider2.collide(contacts, staticBox, dynamicCircle);
 		hit1 = count > 0;
 		drawContacts(g, contacts, count);
-		CircleCircleCollider collider4 = CircleCircleCollider.create();
+		CircleCircleCollider collider4 = new CircleCircleCollider();
 		count = collider4.collide(contacts, staticCircle, dynamicCircle);
 		hit2 = count > 0;
 		drawContacts(g, contacts, count);
-		LineCircleCollider collider6 = LineCircleCollider.create();
+		LineCircleCollider collider6 = new LineCircleCollider();
 		count = collider6.collide(contacts, staticLine, dynamicCircle);
 		hit3 = count > 0;
 		drawContacts(g, contacts, count);

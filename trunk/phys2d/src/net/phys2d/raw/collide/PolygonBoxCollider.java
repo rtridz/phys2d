@@ -35,73 +35,50 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
  * OF SUCH DAMAGE.
  */
-package net.phys2d.raw.shapes;
+package net.phys2d.raw.collide;
+
+import net.phys2d.math.Vector2f;
+import net.phys2d.raw.Body;
+import net.phys2d.raw.Contact;
+import net.phys2d.raw.shapes.Box;
+import net.phys2d.raw.shapes.Polygon;
 
 /**
- * A simple Circle within the simulation, defined by its radius and the
- * position of the body to which it belongs
+ * Collide a Convex Polygon with a Box.
  * 
- * @author Kevin Glass
+ * @author Gideon Smeding
+ *
  */
-public strictfp class Circle extends AbstractShape implements DynamicShape {
-	/** The radius of the circle */
-	private float radius;
-	
-	/**
-	 * Create a new circle based on its radius
-	 * 
-	 * @param radius The radius of the circle
-	 */
-	public Circle(float radius) {
-		super(new AABox(radius*2, radius*2));
-		
-		this.radius = radius;
-	}
+public class PolygonBoxCollider extends PolygonPolygonCollider {
 
 	/**
-	 * Get the radius of the circle
-	 * 
-	 * @return The radius of the circle
+	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */
-	public float getRadius() {
-		return radius;
+	public int collide(Contact[] contacts, Body bodyA, Body bodyB) {
+		Polygon poly = (Polygon) bodyA.getShape();
+		Box box = (Box) bodyB.getShape();
+		
+		// TODO: this can be optimized using matrix multiplications and moving only one shape
+		// specifically the box, because it has fewer vertices.
+		Vector2f[] vertsA = poly.getVertices(bodyA.getPosition(), bodyA.getRotation());
+		Vector2f[] vertsB = box.getPoints(bodyB.getPosition(), bodyB.getRotation());
+		
+		// TODO: use a sweepline that has the smallest projection of the box
+		// now we use just an arbitrary one
+		Vector2f sweepline = new Vector2f(vertsB[1]);
+		sweepline.sub(vertsB[2]);
+		
+		EdgeSweep sweep = new EdgeSweep(sweepline);
+		
+		sweep.addVerticesToSweep(true, vertsA);
+		sweep.addVerticesToSweep(false, vertsB);
+
+		int[][] collEdgeCands = sweep.getOverlappingEdges();
+//		FeaturePair[] featurePairs = getFeaturePairs(contacts.length, vertsA, vertsB, collEdgeCands);
+//		return populateContacts(contacts, vertsA, vertsB, featurePairs);
+		
+		Intersection[][] intersections = getIntersectionPairs(vertsA, vertsB, collEdgeCands);		
+		return populateContacts(contacts, vertsA, vertsB, intersections);
 	}
 
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getSurfaceFactor()
-	 */
-	public float getSurfaceFactor() {
-		float circ = (float) (2 * Math.PI * radius);
-		circ /= 2;
-		
-		return circ * circ;
-	}
-	
-	/**
-	 * Check if this circle touches another
-	 * 
-	 * @param x The x position of this circle
-	 * @param y The y position of this circle
-	 * @param other The other circle
-	 * @param ox The other circle's x position
-	 * @param oy The other circle's y position
-	 * @return True if they touch
-	 */
-	public boolean touches(float x, float y, Circle other, float ox, float oy) {
-		float totalRad2 = getRadius() + other.getRadius();
-		
-		if (Math.abs(ox - x) > totalRad2) {
-			return false;
-		}
-		if (Math.abs(oy - y) > totalRad2) {
-			return false;
-		}
-		
-		totalRad2 *= totalRad2;
-		
-		float dx = Math.abs(ox - x);
-		float dy = Math.abs(oy - y);
-		
-		return totalRad2 >= ((dx*dx) + (dy*dy));
-	}
 }

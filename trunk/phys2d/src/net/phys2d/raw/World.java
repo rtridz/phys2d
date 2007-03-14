@@ -60,7 +60,6 @@ public strictfp class World extends CollisionSpace {
 	private int iterations;
 	/** The damping in effect in the system */
 	private float damping = 1;
-	
 	/**
 	 * Create a new physics model World
 	 * 
@@ -192,9 +191,14 @@ public strictfp class World extends CollisionSpace {
 				temp.add(gravity);
 			}
 			temp.scale(dt);
-			
 			b.adjustVelocity(temp);
+			
+			Vector2f damping = new Vector2f(b.getVelocity());
+			damping.scale(-b.getDamping() * b.getInvMass());
+			b.adjustVelocity(damping);
+			
 			b.adjustAngularVelocity(dt * b.getInvI() * b.getTorque());
+			b.adjustAngularVelocity(-b.getAngularVelocity() * b.getInvI() * b.getRotDamping());
 		}
 
 		for (int i=0;i<arbiters.size();i++) {

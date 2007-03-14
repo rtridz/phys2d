@@ -236,7 +236,7 @@ public strictfp class BasicJoint implements Joint {
 		dv.sub(body1.getVelocity());
 		dv.sub(MathUtil.cross(body1.getAngularVelocity(),r1));
 	    dv.scale(-1);
-	    dv.add(bias);
+	    dv.add(bias); // TODO: is this baumgarte stabilization?
 	    
 	    if (dv.lengthSquared() == 0) {
 	    	return;

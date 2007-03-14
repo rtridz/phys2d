@@ -51,25 +51,7 @@ import net.phys2d.raw.shapes.Circle;
  * 
  * @author Kevin Glass
  */
-public strictfp class CircleCircleCollider implements Collider {
-	/** The single instance of this class */
-	private static CircleCircleCollider single = new CircleCircleCollider();
-	
-	/**
-	 * Create/Get an instance of this class
-	 * 
-	 * @return The instance of this class
-	 */
-	public static CircleCircleCollider create() {
-		return single;
-	}
-
-	/**
-	 * Prevent construction
-	 */
-	private CircleCircleCollider() {	
-	}
-	
+public strictfp class CircleCircleCollider implements Collider {	
 	/**
 	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */

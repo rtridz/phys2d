@@ -41,10 +41,6 @@ import net.phys2d.math.MathUtil;
 import net.phys2d.math.Matrix2f;
 import net.phys2d.math.ROVector2f;
 import net.phys2d.math.Vector2f;
-import net.phys2d.raw.collide.BoxBoxCollider;
-import net.phys2d.raw.collide.CircleBoxCollider;
-import net.phys2d.raw.collide.LineBoxCollider;
-import net.phys2d.raw.collide.Collider;
 
 /**
  * A simple box in the engine - defined by a width and height
@@ -75,27 +71,6 @@ public strictfp class Box extends AbstractShape implements DynamicShape {
 	 */
 	public ROVector2f getSize() {
 		return size;
-	}
-	
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getCollider(net.phys2d.raw.shapes.Shape)
-	 */
-	public final Collider getCollider(Shape other) {
-		return other.getColliderFor(this);
-	}
-	
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Box)
-	 */
-	public Collider getColliderFor(Box other) {
-		return BoxBoxCollider.create();
-	}
-	
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Circle)
-	 */
-	public Collider getColliderFor(Circle other) {
-		return CircleBoxCollider.createCircleBoxCollider();
 	}
 
 	/**
@@ -130,12 +105,5 @@ public strictfp class Box extends AbstractShape implements DynamicShape {
 		pts[3].add(pos);
 
 		return pts;
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Line)
-	 */
-	public Collider getColliderFor(Line other) {
-		return LineBoxCollider.create();
 	}
 }
