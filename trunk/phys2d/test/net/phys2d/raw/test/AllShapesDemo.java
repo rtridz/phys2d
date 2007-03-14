@@ -53,6 +53,8 @@ import net.phys2d.raw.shapes.*;
  * @author gideon
  */
 public class AllShapesDemo extends AbstractDemo  {
+	/** The world in which the simulation takes place */
+	private World world;
 	
 	/**
 	 * Create a new demo instance
@@ -108,12 +110,11 @@ public class AllShapesDemo extends AbstractDemo  {
 	 */
 	protected void renderGUI(Graphics2D g) {
 		g.setColor(Color.black);
-		g.drawString("C - Show/disable contacts",15,450);
-		g.drawString("S - Drop a star",15,480);
-		g.drawString("T - Drop a triangle",125,480);
-		g.drawString("W - Drop a wheel",265,480);
-		g.drawString("L - Drop a line",385, 480);
-		g.drawString("B - Drop a box",385, 460);
+		g.drawString("S - Drop a star",385,70);
+		g.drawString("T - Drop a triangle",385,90);
+		g.drawString("W - Drop a wheel",385,110);
+		g.drawString("L - Drop a line",385, 130);
+		g.drawString("B - Drop a box",385, 150);
 
 		super.renderGUI(g);
 //		
@@ -135,6 +136,8 @@ public class AllShapesDemo extends AbstractDemo  {
 	 * @see net.phys2d.raw.test.AbstractDemo#init(net.phys2d.raw.World)
 	 */
 	protected void init(World world) {
+		this.world = world;
+		
 //		Vector2f[] groundVerts = {new Vector2f(-200, -10), new Vector2f(200,-10), new Vector2f(200,10), new Vector2f(-200,10)};
 //		ConvexPolygon groundBox = new ConvexPolygon(groundVerts);
 //		Box groundBox = new Box(400,20);
