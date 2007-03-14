@@ -35,73 +35,41 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
  * OF SUCH DAMAGE.
  */
-package net.phys2d.raw.shapes;
+package net.phys2d.raw.collide;
 
-/**
- * A simple Circle within the simulation, defined by its radius and the
- * position of the body to which it belongs
+import net.phys2d.math.Vector2f;
+
+
+/** Class representing a single intersection.
+ * TODO: this should be merged with the 'Feature' class, it represents the same thing
  * 
- * @author Kevin Glass
+ * @author Gideon Smeding
  */
-public strictfp class Circle extends AbstractShape implements DynamicShape {
-	/** The radius of the circle */
-	private float radius;
+public class Intersection {
+	/** The edge of polygon A that intersects */
+	public int edgeA;
+	/** The edge of polygon B that intersects */
+	public int edgeB;
 	
-	/**
-	 * Create a new circle based on its radius
-	 * 
-	 * @param radius The radius of the circle
-	 */
-	public Circle(float radius) {
-		super(new AABox(radius*2, radius*2));
-		
-		this.radius = radius;
-	}
+	/** The position of the intersection in world (absolute) coordinates */
+	public Vector2f position;
+	
+	/** True iff this is an intersection where polygon A enters B */
+	public boolean isIngoing;
 
 	/**
-	 * Get the radius of the circle
+	 * Construct an intersection with all its attributes set.
 	 * 
-	 * @return The radius of the circle
+	 * @param edgeA The edge of polygon A that intersects
+	 * @param edgeB The edge of polygon B that intersects
+	 * @param position The position of the intersection in world (absolute) coordinates
+	 * @param isIngoing True iff this is an intersection where polygon A enters B 
 	 */
-	public float getRadius() {
-		return radius;
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getSurfaceFactor()
-	 */
-	public float getSurfaceFactor() {
-		float circ = (float) (2 * Math.PI * radius);
-		circ /= 2;
-		
-		return circ * circ;
-	}
-	
-	/**
-	 * Check if this circle touches another
-	 * 
-	 * @param x The x position of this circle
-	 * @param y The y position of this circle
-	 * @param other The other circle
-	 * @param ox The other circle's x position
-	 * @param oy The other circle's y position
-	 * @return True if they touch
-	 */
-	public boolean touches(float x, float y, Circle other, float ox, float oy) {
-		float totalRad2 = getRadius() + other.getRadius();
-		
-		if (Math.abs(ox - x) > totalRad2) {
-			return false;
-		}
-		if (Math.abs(oy - y) > totalRad2) {
-			return false;
-		}
-		
-		totalRad2 *= totalRad2;
-		
-		float dx = Math.abs(ox - x);
-		float dy = Math.abs(oy - y);
-		
-		return totalRad2 >= ((dx*dx) + (dy*dy));
+	public Intersection(int edgeA, int edgeB, Vector2f position, boolean isIngoing) {
+		super();
+		this.edgeA = edgeA;
+		this.edgeB = edgeB;
+		this.position = position;
+		this.isIngoing = isIngoing;
 	}
 }

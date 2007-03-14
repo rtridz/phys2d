@@ -58,19 +58,6 @@ import net.phys2d.raw.shapes.Box;
  * @author Kevin Glass
  */
 public strictfp class BoxBoxCollider implements Collider {
-	/**
-	 * The single instance of our collider
-	 */
-	private static BoxBoxCollider single = new BoxBoxCollider();
-	
-	/**
-	 * Create a new collider
-	 * 
-	 * @return The box2box collider
-	 */
-	public static BoxBoxCollider create() {
-		return single;
-	}
 
 //	 Box vertex and edge numbering:
 	//

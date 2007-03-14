@@ -41,14 +41,20 @@
 package net.phys2d.raw;
 
 import net.phys2d.raw.collide.Collider;
+import net.phys2d.raw.collide.ColliderFactory;
+import net.phys2d.raw.collide.ColliderUnavailableException;
 
 /**
  * A static utility for resolve the collision between shapes
+ * 
+ * TODO: make this nonstatic to allow a user to provide his/her own factory
  * 
  * @author Kevin Glass
  */
 public strictfp class Collide {
 
+	/** The factory that provides us with colliders */
+	private static ColliderFactory collFactory = new ColliderFactory();
 
 	/**
 	 * Perform the collision between two bodies
@@ -61,7 +67,14 @@ public strictfp class Collide {
 	 */
 	public static int collide(Contact[] contacts, Body bodyA, Body bodyB, float dt)
 	{
-		Collider collider = bodyA.getShape().getCollider(bodyB.getShape());
+		Collider collider;
+		try {
+			collider = collFactory.createCollider(bodyA, bodyB);
+		} catch (ColliderUnavailableException e) {
+			System.out.println(e.getMessage()
+					+ "\n Ignoring any possible collision between the bodies in question");
+			return 0;
+		}
 		
 		return collider.collide(contacts, bodyA, bodyB);
 	}

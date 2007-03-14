@@ -21,6 +21,8 @@ public class CollisionSpace implements CollisionContext {
 	protected ArrayList listeners = new ArrayList();
 	/** The total time passed */
 	protected float totalTime;
+	/** The bitmask that determine which bits are used for collision detection */
+	private long bitmask = 0xFFFFFFFFFFFFFFFFL;
 	
 	/**
 	 * Create a new collision space based on a given strategy for 
@@ -85,15 +87,6 @@ public class CollisionSpace implements CollisionContext {
 	 */
 	public void remove(Body body) {
 		bodies.remove(body);
-		
-		for (int i=0;i<arbiters.size();i++) {
-			Arbiter arb = arbiters.get(i);
-			
-			if ((arb.getBody1() == body) || (arb.getBody2() == body)) {
-				arbiters.remove(arb);
-				i--;
-			}
-		}
 	}
 	
 	/**
@@ -148,6 +141,9 @@ public class CollisionSpace implements CollisionContext {
 			for (int j = i+1; j < bodyList.size(); ++j)
 			{
 				Body bj = bodyList.get(j);
+				if ((bitmask & bi.getBitmask() & bj.getBitmask()) == 0) {
+					continue;
+				}
 				if (bi.getExcludedList().contains(bj)) {
 					continue;
 				}
@@ -163,7 +159,7 @@ public class CollisionSpace implements CollisionContext {
 					arbiters.remove(new Arbiter(bi,bj));
 					continue;
 				}
-
+				
 				Arbiter newArb = new Arbiter(bi, bj);
 				newArb.collide(dt);
 				
@@ -187,5 +183,49 @@ public class CollisionSpace implements CollisionContext {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the bitmask used to determine which
+	 * bits are allowed to collide.
+	 * 
+	 * @return The bitmask of bits that allow collisions
+	 */
+	public long getBitmask() {
+		return bitmask;
+	}
+
+	/**
+	 * Set the bitmask used to determine which
+	 * bits are allowed to collide.
+	 * 
+	 * @param bitmask The new bitmask of bits that allow collisions
+	 */
+	public void setBitmask(long bitmask) {
+		this.bitmask = bitmask;
+	}
+
+	/**
+	 * Set one or more individual bits of
+	 * the bitmask used to determine which
+	 * bits are allowed to collide.
+	 * 
+	 * @param bitmask A bitmask with the bits
+	 * that will be switched on.
+	 */
+	public void addBit(long bitmask) {
+		this.bitmask = this.bitmask | bitmask;
+	}
+
+	/**
+	 * Remove one or more individual bits of
+	 * the bitmask used to determine which
+	 * bits are allowed to collide.
+	 * 
+	 * @param bitmask A bitmask with the bits
+	 * that will be switched off.
+	 */
+	public void removeBit(long bitmask) {
+		this.bitmask -= bitmask & this.bitmask;
 	}
 }

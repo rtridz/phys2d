@@ -37,8 +37,6 @@
  */
 package net.phys2d.raw.shapes;
 
-import net.phys2d.raw.collide.Collider;
-
 /**
  * A simple shape describing the area covered by a body
  * 
@@ -52,42 +50,6 @@ public interface Shape {
 	 * @return The bounds of the shape
 	 */
 	public AABox getBounds();
-	
-	/**
-	 * Get the collider that resolves collisions between this shape
-	 * and another
-	 * 
-	 * @param other The other shape for this collision
-	 * @return The collider to resolve this combination
-	 */
-	public Collider getCollider(Shape other);
-	
-	/**
-	 * Get the collider for this shape and a box. The box is considerd 
-	 * the first body.
-	 * 
-	 * @param other The box we're going to collide against
-	 * @return The collider to resolve this collision
-	 */
-	public Collider getColliderFor(Box other);
-
-	/**
-	 * Get the collider for this shape and a circle. The circle is considerd 
-	 * the first body.
-	 * 
-	 * @param other The circle we're going to collide against
-	 * @return The collider to resolve this collision
-	 */
-	public Collider getColliderFor(Circle other);
-	
-	/**
-	 * Get the collider for this shape and a line. The line is considerd 
-	 * the first body.
-	 * 
-	 * @param other The line we're going to collide against
-	 * @return The collider to resolve this collision
-	 */
-	public Collider getColliderFor(Line other);
 	
 	/**
 	 * Some factor based on the edges length of the shape

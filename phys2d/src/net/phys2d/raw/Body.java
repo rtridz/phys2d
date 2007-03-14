@@ -58,7 +58,9 @@ public strictfp class Body {
 	
 	/** The current position of this body */
 	private Vector2f position = new Vector2f();
-	/** The current rotation of this body */
+	/** The position of this body in the last frame */
+	private Vector2f lastPosition = new Vector2f();
+	/** The current rotation of this body in radians */
 	private float rotation;
 
 	/** The velocity of this body */
@@ -80,7 +82,11 @@ public strictfp class Body {
 	private Shape shape;
 	
 	/** The friction on the surface of this body */
-	private float friction;
+	private float surfaceFriction;
+	/** The damping caused by friction of the 'air' on this body. */
+	private float damping;
+	/** The rotational damping. */
+	private float rotDamping;
 	/** The mass of this body */
 	private float mass;
 	/** The inverse mass of this body */
@@ -99,6 +105,27 @@ public strictfp class Body {
 	private BodyList excluded = new BodyList();
 	/** True if this body is effected by gravity */
 	private boolean gravity = true;
+	
+	/** The collision group bitmask */
+	private long bitmask = 0xFFFFFFFFFFFFFFFFL;
+	/** A hackish hook for the library's user's data */
+	private Object userData = null;
+	
+	/**
+	 * Attach an object to this Body. Any previously
+	 * set userdata will be lost.
+	 * 
+	 * @param o The (new) userdata.
+	 */
+	public void setUserData(Object o) { userData = o; }
+	
+	/**
+	 * Retrieved the attached object which initially
+	 * will be null.
+	 * 
+	 * @return The attached userdata.
+	 */
+	public Object getUserData() { return userData; }
 	
 	/**
 	 * Create a new un-named body
@@ -144,12 +171,13 @@ public strictfp class Body {
 
 		id = NEXT_ID++;
 		position.set(0.0f, 0.0f);
+		lastPosition.set(0.0f, 0.0f);
 		rotation = 0.0f;
 		velocity.set(0.0f, 0.0f);
 		angularVelocity = 0.0f;
 		force.set(0.0f, 0.0f);
 		torque = 0.0f;
-		friction = 0.2f;
+		surfaceFriction = 0.2f;
 
 		//size.set(1.0f, 1.0f);
 		mass = INFINITE_MASS;
@@ -269,12 +297,13 @@ public strictfp class Body {
 	 */
 	public void set(Shape shape, float m) {
 		position.set(0.0f, 0.0f);
+		lastPosition.set(0.0f, 0.0f);
 		rotation = 0.0f;
 		velocity.set(0.0f, 0.0f);
 		angularVelocity = 0.0f;
 		force.set(0.0f, 0.0f);
 		torque = 0.0f;
-		friction = 0.2f;
+		surfaceFriction = 0.2f;
 
 		this.shape = shape;
 		mass = m;
@@ -301,16 +330,69 @@ public strictfp class Body {
 	 * @param friction The friction on the surface of this body
 	 */
 	public void setFriction(float friction) {
-		this.friction = friction;
+		this.surfaceFriction = friction;
 	}
 	
 	/**
-	 * Set the rotation of this body
+	 * Set the rotation in radians of this body
 	 * 
 	 * @param rotation The new rotation of the body
 	 */
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
+	}
+	
+	/**
+	 * Set the friction of the 'air' on this body
+	 * that slows down the object.
+	 * TODO: check how this works together with the gravity
+	 * The friction force F will be
+	 * F = -v * damping / m
+	 * 
+	 * @param damping The friction damping factor which
+	 * represents the body's airodynamic properties.
+	 */
+	public void setDamping(float damping) {
+		this.damping = damping;
+	}
+	
+	/**
+	 * Get the friction of the 'air' on this body
+	 * that slows down the object.
+	 * 
+	 * @return The friction damping factor which
+	 * represents the body's airodynamic properties.
+	 */
+	public float getDamping() {
+		return this.damping;
+	}
+	
+	/**
+	 * Set the rotational damping, similar to normal
+	 * damping. The torque F for this damping would be:
+	 * F = -av * damping / m
+	 * where av is the angular velocity. 
+	 * 
+	 * @see #setDamping(float)
+	 * 
+	 * @param damping The rotational damping which
+	 * represents the body's airodynamic properties
+	 * when rotating. 
+	 */
+	public void setRotDamping(float damping) {
+		this.rotDamping = damping;
+	}
+	
+	/**
+	 * Get the rotational damping, similar to normal
+	 * damping.
+	 * 
+	 * @return damping The rotational damping which
+	 * represents the body's airodynamic properties
+	 * when rotating. 
+	 */
+	public float getRotDamping() {
+		return this.rotDamping;
 	}
 	
 	/**
@@ -323,12 +405,27 @@ public strictfp class Body {
 	}
 	
 	/**
-	 * Set the position of this body 
+	 * Set the position of this body, this will also set the previous position
+	 * to the same value.
 	 * 
 	 * @param x The x position of this body
 	 * @param y The y position of this body
 	 */
 	public void setPosition(float x, float y) {
+		position.set(x,y);
+		lastPosition.set(x,y);
+	}
+	
+	/**
+	 * Set the position of this body after it has moved
+	 * this means the last position will contain the position
+	 * before this function was called.
+	 * 
+	 * @param x The x position of this body
+	 * @param y The y position of this body
+	 */
+	public void move(float x, float y) {
+		lastPosition.set(position);
 		position.set(x,y);
 	}
 	
@@ -342,7 +439,16 @@ public strictfp class Body {
 	}
 	
 	/**
-	 * Get the rotation of this body
+	 * Get the position of this body before it was moved
+	 * 
+	 * @return The last position of this body
+	 */
+	public ROVector2f getLastPosition() {
+		return lastPosition;
+	}
+	
+	/**
+	 * Get the rotation in radians of this body
 	 * 
 	 * @return The rotation of this body
 	 */
@@ -360,22 +466,28 @@ public strictfp class Body {
 	}
 
 	/**
-	 * Adjust the position of this body
+	 * Adjust the position of this body.
+	 * The previous position will be set to the position before
+	 * this function was called.
 	 * 
 	 * @param delta The amount to change the position by
 	 * @param scale The amount to scale the delta by
 	 */
 	public void adjustPosition(ROVector2f delta, float scale) {
+		lastPosition.set(position);
 		position.x += delta.getX() * scale;
 		position.y += delta.getY() * scale;
 	}
 	
 	/**
 	 * Adjust the position of this body
+	 * The previous position will be set to the position before
+	 * this function was called.
 	 * 
 	 * @param delta The amount to change the position by
 	 */
 	public void adjustPosition(Vector2f delta) {
+		lastPosition.set(position);
 		position.add(delta);
 	}
 
@@ -449,7 +561,7 @@ public strictfp class Body {
 	 * @return The friction of this surface of this body
 	 */
 	public float getFriction() {
-		return friction;
+		return surfaceFriction;
 	}
 	
 	/**
@@ -568,4 +680,44 @@ public strictfp class Body {
 		
 		return velEnergy + angEnergy;
 	}
+	
+	/**
+	 * Get this shape's bitmask
+	 * 
+	 * @return This shape's bitmask
+	 */
+	public long getBitmask() {
+		return bitmask;
+	}
+	
+	/**
+	 * Set the bismask for this shape.
+	 * 
+	 * @param bitmask The new bitmask for this shape
+	 */
+	public void setBitmask(long bitmask) {
+		this.bitmask = bitmask;
+	}
+	
+	/**
+	 * Set one or more individual bits.
+	 * 
+	 * @param bitmask A bitmask with the bits
+	 * that will be switched on.
+	 */
+	public void addBit(long bitmask) {
+		this.bitmask = this.bitmask | bitmask;
+	}
+	
+	/**
+	 * Remove one or more individual bits.
+	 * The set bits will be removed.
+	 * 
+	 * @param bitmask A bitmask with the bits
+	 * that will be switched off.
+	 */
+	public void removeBit(long bitmask) {
+		this.bitmask -= bitmask & this.bitmask;
+	}
+
 }

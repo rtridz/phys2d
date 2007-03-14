@@ -39,7 +39,6 @@ package net.phys2d.raw.shapes;
 
 import net.phys2d.math.ROVector2f;
 import net.phys2d.math.Vector2f;
-import net.phys2d.raw.collide.Collider;
 
 /**
  * Implemenation of a bunch of maths functions to do with lines. Note
@@ -48,7 +47,7 @@ import net.phys2d.raw.collide.Collider;
  * 
  * @author Kevin Glass
  */
-public strictfp class Line extends AbstractShape {
+public strictfp class Line extends AbstractShape implements DynamicShape {
 	/** The start point of the line */
 	private ROVector2f start;
 	/** The end point of the line */
@@ -123,23 +122,25 @@ public strictfp class Line extends AbstractShape {
 	public Line(ROVector2f start, ROVector2f end) {
 		super();
 		
-		float width = Math.abs(end.getX()-start.getX());
-		float height = Math.abs(end.getY()-start.getY());
-		float xoffset = width/2;
-		float yoffset = height/2;
-		if (width < 10) {
-			width = 10;
-		}
-		if (height < 10) {
-			height = 50;
-		}
-		if (end.getY() < start.getY()) {
-			yoffset = -yoffset;
-		}
-		if (end.getX() < start.getX()) {
-			xoffset = -xoffset;
-		}
-		bounds = new AABox(xoffset,yoffset,width,height);
+//		float width = Math.abs(end.getX()-start.getX());
+//		float height = Math.abs(end.getY()-start.getY());
+//		float xoffset = width/2;
+//		float yoffset = height/2;
+//		if (width < 10) {
+//			width = 10;
+//		}
+//		if (height < 10) {
+//			height = 50;
+//		}
+//		if (end.getY() < start.getY()) {
+//			yoffset = -yoffset;
+//		}
+//		if (end.getX() < start.getX()) {
+//			xoffset = -xoffset;
+//		}
+		//TODO: do this properly!
+		float radius = Math.max(start.length(), end.length());
+		bounds = new AABox(0,0,radius*2,radius*2);
 		
 		set(start,end);
 	}
@@ -346,52 +347,49 @@ public strictfp class Line extends AbstractShape {
 	}
 
 	/**
-	 * @see net.phys2d.raw.shapes.Shape#getCollider(net.phys2d.raw.shapes.Shape)
-	 */
-	public Collider getCollider(Shape other) {
-		return other.getColliderFor(this);
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Box)
-	 */
-	public Collider getColliderFor(Box other) {
-		throw new RuntimeException("Dynamic lines are not currently supported");
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Circle)
-	 */
-	public Collider getColliderFor(Circle other) {
-		throw new RuntimeException("Dynamic lines are not currently supported");
-	}
-
-	/**
 	 * @see net.phys2d.raw.shapes.Shape#getSurfaceFactor()
 	 */
 	public float getSurfaceFactor() {
 		return lengthSquared() / 2;
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getColliderFor(net.phys2d.raw.shapes.Line)
-	 */
-	public Collider getColliderFor(Line other) {
-		throw new RuntimeException("Dynamic lines are not currently supported");
 	}
 	
 	/**
 	 * Get a line starting a x,y and ending offset from the current
 	 * end point. Curious huh?
 	 * 
-	 * @param x The x coordinate of the new starting point
-	 * @param y The y coordinate of the new starting point
+	 * @param displacement The displacement of the line
+	 * @param rotation The rotation of the line in radians
 	 * @return The newly created line
 	 */
-	public Line getPositionedLine(float x, float y) {
-		Line line = new Line(x,y,x+end.getX(),y+end.getY());
+	public Line getPositionedLine(ROVector2f displacement, float rotation) {
+		Vector2f[] verts = getVertices(displacement, rotation);
+		Line line = new Line(verts[0], verts[1]);
 		
 		return line;
+	}
+	
+	/**
+	 * Return a translated and rotated line.
+	 * 
+	 * @param displacement The displacement of the line
+	 * @param rotation The rotation of the line in radians
+	 * @return The two endpoints of this line
+	 */
+	public Vector2f[] getVertices(ROVector2f displacement, float rotation) {
+		float cos = (float) Math.cos(rotation);
+		float sin = (float) Math.sin(rotation);
+		
+		Vector2f[] endPoints = new Vector2f[2];
+		endPoints[0] = new Vector2f(//getX1(), getY1());
+				getX1() * cos - getY1() * sin,
+				getY1() * cos + getX1() * sin);
+		endPoints[0].add(displacement);
+		endPoints[1] = new Vector2f(//getX2(), getY2());
+				getX2() * cos - getY2() * sin,
+				getY2() * cos + getX2() * sin);
+		endPoints[1].add(displacement);
+		
+		return endPoints;
 	}
 	
 	/**
@@ -444,4 +442,5 @@ public strictfp class Line extends AbstractShape {
 		
 		return new Vector2f(ix,iy);
 	}
+	
 }

@@ -37,6 +37,7 @@
  */
 package net.phys2d.raw.collide;
 
+import net.phys2d.math.ROVector2f;
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.Contact;
@@ -50,25 +51,7 @@ import net.phys2d.raw.shapes.Line;
  * @author Kevin Glass
  */
 public strictfp class LineCircleCollider implements Collider {
-	/** The single instance of this class */
-	private static LineCircleCollider single = new LineCircleCollider();
-	
-	/**
-	 * Create a new line circle collider. Place holder method just
-	 * in case this class becomes stateful
-	 *  
-	 * @return The newly created line circle collider
-	 */
-	public static LineCircleCollider create() {
-		return single;
-	}
 
-	/**
-	 * Prevent construction outside of this class
-	 */
-	private LineCircleCollider() {
-		
-	}
 	/**
 	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */
@@ -76,25 +59,59 @@ public strictfp class LineCircleCollider implements Collider {
 		Line line = (Line) bodyA.getShape();
 		Circle circle = (Circle) bodyB.getShape();
 		
-		line = line.getPositionedLine(bodyA.getPosition().getX(),
-				 					  bodyA.getPosition().getY());
+		Vector2f[] vertsA = line.getVertices(bodyA.getPosition(), bodyA.getRotation());
 		
-		float dis2 = line.distanceSquared(bodyB.getPosition());
-		float r2 = circle.getRadius() * circle.getRadius();
-
-		if (dis2 < r2) {
-			Vector2f pt = new Vector2f();
-			
-			line.getClosestPoint(bodyB.getPosition(), pt);
-			Vector2f normal = new Vector2f(bodyB.getPosition());
-			normal.sub(pt);
-			float sep = circle.getRadius() - normal.length();
-			normal.normalise();
-			
-			contacts[0].setSeparation(-sep);
-			contacts[0].setPosition(pt);
-			contacts[0].setNormal(normal);
+		// compute intersection of the line A and a line parallel to 
+		// the line A's normal passing through the origin of B
+		Vector2f startA = vertsA[0];
+		Vector2f endA = vertsA[1];
+		ROVector2f startB = bodyB.getPosition();
+		Vector2f endB = new Vector2f(endA);
+		endB.sub(startA);
+		endB.set(endB.y, -endB.x);
+//		endB.add(startB);// TODO: inline endB into equations below, this last operation will be useless..
+		
+		//TODO: reuse mathutil.intersect
+//		float d = (endB.y - startB.getY()) * (endA.x - startA.x);
+//		d -= (endB.x - startB.getX()) * (endA.y - startA.y);
+//		
+//		float uA = (endB.x - startB.getX()) * (startA.y - startB.getY());
+//		uA -= (endB.y - startB.getY()) * (startA.x - startB.getX());
+//		uA /= d;
+		float d = endB.y * (endA.x - startA.x);
+		d -= endB.x * (endA.y - startA.y);
+		
+		float uA = endB.x * (startA.y - startB.getY());
+		uA -= endB.y * (startA.x - startB.getX());
+		uA /= d;
+		
+		Vector2f position = null;
+		
+		if ( uA < 0 ) { // the intersection is somewhere before startA
+			position = startA;
+		} else if ( uA > 1 ) { // the intersection is somewhere after endA
+			position = endA;
+		} else {
+			position = new Vector2f(
+					startA.x + uA * (endA.x - startA.x),
+					startA.y + uA * (endA.y - startA.y));
+		}
+		
+		Vector2f normal = endB; // reuse of vector object
+		normal.set(startB);
+		normal.sub(position);
+		float distSquared = normal.lengthSquared();
+		float radiusSquared = circle.getRadius() * circle.getRadius();
+		
+		if ( distSquared < radiusSquared ) {
+			contacts[0].setPosition(position);
 			contacts[0].setFeature(new FeaturePair());
+			
+			normal.normalise();
+			contacts[0].setNormal(normal);
+			
+			float separation = (float) Math.sqrt(distSquared) - circle.getRadius();
+			contacts[0].setSeparation(separation);
 			
 			return 1;
 		}

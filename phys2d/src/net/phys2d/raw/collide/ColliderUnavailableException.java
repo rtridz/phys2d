@@ -35,73 +35,41 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
  * OF SUCH DAMAGE.
  */
-package net.phys2d.raw.shapes;
+package net.phys2d.raw.collide;
+
+import net.phys2d.raw.shapes.Shape;
 
 /**
- * A simple Circle within the simulation, defined by its radius and the
- * position of the body to which it belongs
+ * An exception that is thrown by the ColliderFactory when no
+ * suitable collider has been found.
+ * The primary reason for this class is to allow us to catch
+ * this exception, which previously was impossible with the
+ * runtime exceptions.
  * 
- * @author Kevin Glass
+ * A second reason is that a custom factory might overload this
+ * exception.
+ * 
+ * @author Gideon Smeding
+ *
  */
-public strictfp class Circle extends AbstractShape implements DynamicShape {
-	/** The radius of the circle */
-	private float radius;
+public class ColliderUnavailableException extends Exception {
 	
 	/**
-	 * Create a new circle based on its radius
+	 * Constructs an exception in case there is no collider
+	 * for a specific combination of two shapes.
 	 * 
-	 * @param radius The radius of the circle
+	 * @param shapeA First shape 
+	 * @param shapeB Second shape
 	 */
-	public Circle(float radius) {
-		super(new AABox(radius*2, radius*2));
-		
-		this.radius = radius;
-	}
-
-	/**
-	 * Get the radius of the circle
-	 * 
-	 * @return The radius of the circle
-	 */
-	public float getRadius() {
-		return radius;
-	}
-
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getSurfaceFactor()
-	 */
-	public float getSurfaceFactor() {
-		float circ = (float) (2 * Math.PI * radius);
-		circ /= 2;
-		
-		return circ * circ;
+	public ColliderUnavailableException(Shape shapeA, Shape shapeB) {
+		super(	"No collider available for shapes of type " 
+				+ shapeA.getClass().getCanonicalName()
+				+ " and "
+				+ shapeB.getClass().getCanonicalName());
 	}
 	
-	/**
-	 * Check if this circle touches another
-	 * 
-	 * @param x The x position of this circle
-	 * @param y The y position of this circle
-	 * @param other The other circle
-	 * @param ox The other circle's x position
-	 * @param oy The other circle's y position
-	 * @return True if they touch
-	 */
-	public boolean touches(float x, float y, Circle other, float ox, float oy) {
-		float totalRad2 = getRadius() + other.getRadius();
-		
-		if (Math.abs(ox - x) > totalRad2) {
-			return false;
-		}
-		if (Math.abs(oy - y) > totalRad2) {
-			return false;
-		}
-		
-		totalRad2 *= totalRad2;
-		
-		float dx = Math.abs(ox - x);
-		float dy = Math.abs(oy - y);
-		
-		return totalRad2 >= ((dx*dx) + (dy*dy));
-	}
+	
+	/** A constructor that can be used by subclasses. */
+	protected ColliderUnavailableException() {}
+
 }

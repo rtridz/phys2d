@@ -35,73 +35,49 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
  * OF SUCH DAMAGE.
  */
-package net.phys2d.raw.shapes;
+package net.phys2d.raw.collide;
+
+import net.phys2d.math.MathUtil;
+import net.phys2d.math.Vector2f;
+import net.phys2d.raw.Body;
+import net.phys2d.raw.Contact;
 
 /**
- * A simple Circle within the simulation, defined by its radius and the
- * position of the body to which it belongs
+ * A collider wrapper that swaps the collision result of the collider.
+ * This is very useful to get rid of code duplication for colliders like
+ * CircleBoxCollider and BoxCircleCollider.
  * 
- * @author Kevin Glass
+ * @author Gideon Smeding
+ *
  */
-public strictfp class Circle extends AbstractShape implements DynamicShape {
-	/** The radius of the circle */
-	private float radius;
+public class SwapCollider implements Collider {
+	
+	/** The wrapped collider of which the result will be swapped */
+	private Collider collider;
 	
 	/**
-	 * Create a new circle based on its radius
+	 * Create a collider that swaps the result of the wrapped
+	 * collider.
 	 * 
-	 * @param radius The radius of the circle
+	 * @param collider The collider of which to swap the result
 	 */
-	public Circle(float radius) {
-		super(new AABox(radius*2, radius*2));
-		
-		this.radius = radius;
+	public SwapCollider(Collider collider) {
+		this.collider = collider;
 	}
 
 	/**
-	 * Get the radius of the circle
-	 * 
-	 * @return The radius of the circle
+	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */
-	public float getRadius() {
-		return radius;
+	public int collide(Contact[] contacts, Body bodyA, Body bodyB) {
+		int count = collider.collide(contacts, bodyB, bodyA);
+		
+		// reverse the collision results by inverting normals
+		for ( int i = 0; i < count; i++ ) {
+			Vector2f vec = MathUtil.scale(contacts[i].getNormal(),-1);
+			contacts[i].setNormal(vec);
+		}
+		
+		return count;
 	}
 
-	/**
-	 * @see net.phys2d.raw.shapes.Shape#getSurfaceFactor()
-	 */
-	public float getSurfaceFactor() {
-		float circ = (float) (2 * Math.PI * radius);
-		circ /= 2;
-		
-		return circ * circ;
-	}
-	
-	/**
-	 * Check if this circle touches another
-	 * 
-	 * @param x The x position of this circle
-	 * @param y The y position of this circle
-	 * @param other The other circle
-	 * @param ox The other circle's x position
-	 * @param oy The other circle's y position
-	 * @return True if they touch
-	 */
-	public boolean touches(float x, float y, Circle other, float ox, float oy) {
-		float totalRad2 = getRadius() + other.getRadius();
-		
-		if (Math.abs(ox - x) > totalRad2) {
-			return false;
-		}
-		if (Math.abs(oy - y) > totalRad2) {
-			return false;
-		}
-		
-		totalRad2 *= totalRad2;
-		
-		float dx = Math.abs(ox - x);
-		float dy = Math.abs(oy - y);
-		
-		return totalRad2 >= ((dx*dx) + (dy*dy));
-	}
 }
