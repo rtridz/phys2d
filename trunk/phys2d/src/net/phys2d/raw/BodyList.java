@@ -63,7 +63,7 @@ public class BodyList {
 	 * 
 	 * @param list The list of elements to add to the new list
 	 */
-	private BodyList(BodyList list) {
+	BodyList(BodyList list) {
 		elements.addAll(list.elements);
 	}
 	

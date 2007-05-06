@@ -135,7 +135,7 @@ public strictfp class Body {
 	/** The amoutn a body has to move for it to be considered non-resting */
 	private float positionTolerance; 
 	/** The list of bodies this body touches */
-	private ArrayList touching = new ArrayList();
+	private BodyList touching = new BodyList();
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -321,7 +321,7 @@ public strictfp class Body {
 		
 		path.add(this);
 		for (int i=0;i<touching.size();i++) {
-			Body body = (Body) touching.get(i);
+			Body body = touching.get(i);
 			if (path.contains(body)) {
 				continue;
 			}
@@ -338,6 +338,50 @@ public strictfp class Body {
 		path.remove(this);
 		
 		return result;
+	}
+	
+	/**
+	 * Get the list of bodies that this body is touching. Only works if 
+	 * resting body detection is turned on
+	 * 
+	 * @return The list of bodies this body touches
+	 */
+	public BodyList getTouching() {
+		return new BodyList(touching);
+	}
+
+	/**
+	 * Get the list of bodies that this body is connected to. Only works if 
+	 * resting body detection is turned on
+	 * 
+	 * @return The list of bodies this body touches
+	 */
+	public BodyList getConnected() {
+		BodyList connected = new BodyList();
+		getConnected(connected, new ArrayList());
+		
+		return connected;
+	}
+	
+	/**
+	 * Get the bodies connected to this one
+	 * 
+	 * @param list The list we're building up
+	 * @param path
+	 */
+	private void getConnected(BodyList list, ArrayList path) {
+		path.add(this);
+		for (int i=0;i<touching.size();i++) {
+			Body body = touching.get(i);
+			if (path.contains(body)) {
+				continue;
+			}
+			
+			list.add(body);
+			body.getConnected(list, path);
+		}
+		
+		path.remove(this);
 	}
 	
 	/**
