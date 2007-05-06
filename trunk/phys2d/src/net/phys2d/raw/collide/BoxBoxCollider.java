@@ -247,6 +247,9 @@ public strictfp class BoxBoxCollider implements Collider {
 		c[1].v.add(pos);
 	}
 	
+	private static Vector2f hA = new Vector2f();
+	private static Vector2f hB = new Vector2f();
+	
 	/**
 	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
 	 */
@@ -262,8 +265,12 @@ public strictfp class BoxBoxCollider implements Collider {
 		}
 		
 		// Setup
-		Vector2f hA = MathUtil.scale(((Box) bodyA.getShape()).getSize(), 0.5f);
-		Vector2f hB = MathUtil.scale(((Box) bodyB.getShape()).getSize(), 0.5f);
+		hA.set(((Box) bodyA.getShape()).getSize());
+		hA.scale(0.5f);
+		//Vector2f hA = MathUtil.scale(((Box) bodyA.getShape()).getSize(), 0.5f);
+		hB.set(((Box) bodyB.getShape()).getSize());
+		hB.scale(0.5f);
+		//Vector2f hB = MathUtil.scale(((Box) bodyB.getShape()).getSize(), 0.5f);
 		//Vector2f hA = MathUtil.scale(bodyA.getSize(), 0.5f);
 		//Vector2f hB = MathUtil.scale(bodyB.getSize(), 0.5f);
 
