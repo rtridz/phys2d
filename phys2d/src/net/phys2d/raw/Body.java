@@ -40,6 +40,8 @@
  */
 package net.phys2d.raw;
 
+import java.util.ArrayList;
+
 import net.phys2d.math.ROVector2f;
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.shapes.DynamicShape;
@@ -132,6 +134,8 @@ public strictfp class Body {
 	private float rotationTolerance; 
 	/** The amoutn a body has to move for it to be considered non-resting */
 	private float positionTolerance; 
+	/** The list of bodies this body touches */
+	private ArrayList touching = new ArrayList();
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -233,6 +237,7 @@ public strictfp class Body {
 		oldRotation = getRotation();
 		hitByAnother = false;
 		hitCount = 0;
+		touching.clear();
 	}
 	
 	/**
@@ -243,6 +248,10 @@ public strictfp class Body {
 	public void collided(Body other) {
 		if (!restingBodyDetection) {
 			return;
+		}
+
+		if (!touching.contains(other)) {
+			touching.add(other);
 		}
 		
 		if (isResting()) {
@@ -290,7 +299,54 @@ public strictfp class Body {
 				isResting = false;
 				setMass(originalMass);
 			}
+			
+			if (isResting) {
+				if (!isTouchingStatic(new ArrayList())) {
+					isResting = false;
+					setMass(originalMass);
+				}
+			}
 		}
+		
+	}
+	
+	/**
+	 * Check if this body is touching a static body directly or indirectly
+	 * 
+	 * @param path The path of bodies we've used to get here
+	 * @return True if we're touching a static body
+	 */
+	public boolean isTouchingStatic(ArrayList path) {
+		boolean result = false;
+		
+		path.add(this);
+		for (int i=0;i<touching.size();i++) {
+			Body body = (Body) touching.get(i);
+			if (path.contains(body)) {
+				continue;
+			}
+			if (body.isStatic()) {
+				result = true;
+				break;
+			}
+			
+			if (body.isTouchingStatic(path)) {
+				result = true;
+				break;
+			}
+		}
+		path.remove(this);
+		
+		return result;
+	}
+	
+	/**
+	 * Check if this body is static
+	 * 
+	 * @return True if this body is static
+	 */
+	public boolean isStatic() {
+		return false;
 	}
 	
 	/**
