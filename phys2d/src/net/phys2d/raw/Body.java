@@ -108,8 +108,30 @@ public strictfp class Body {
 	
 	/** The collision group bitmask */
 	private long bitmask = 0xFFFFFFFFFFFFFFFFL;
-	/** A hackish hook for the library's user's data */
+	/** A hook for the library's user's data */
 	private Object userData = null;
+	/** The old position */
+	private Vector2f oldPosition;
+	/** The old position */
+	private float oldRotation;
+	/** The new position */
+	private Vector2f newPosition;
+	/** True if we've been hit by another this frame */
+	private boolean hitByAnother;
+	/** True if we're considered static at the moment */
+	private boolean isResting;
+	/** The original mass of this object */
+	private float originalMass;
+	/** The number of hits this frame */
+	private int hitCount = 0;
+	/** True if resting body detection is turned on */
+	private boolean restingBodyDetection = false;
+	/** The velocity a body hitting a resting body has to have to consider moving it */
+	private float hitTolerance; 
+	/** The amount a body has to rotate for it to be considered non-resting */
+	private float rotationTolerance; 
+	/** The amoutn a body has to move for it to be considered non-resting */
+	private float positionTolerance; 
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -185,7 +207,112 @@ public strictfp class Body {
 		I = INFINITE_MASS;
 		invI = 0.0f;
 		
+		originalMass = m;
 		set(shape,m);
+	}
+
+	/**
+	 * Enable resting body detection.
+	 * 
+	 * @param hitTolerance The velocity a body hitting a resting body has to have to consider moving it
+	 * @param rotationTolerance The amount a body has to rotate for it to be considered non-resting
+	 * @param positionTolerance The amoutn a body has to move for it to be considered non-resting
+	 */
+	void configureRestingBodyDetection(float hitTolerance, float rotationTolerance, float positionTolerance) {
+		this.hitTolerance = hitTolerance;
+		this.rotationTolerance = rotationTolerance;
+		this.positionTolerance = positionTolerance;
+		restingBodyDetection = true;
+	}
+	
+	/**
+	 * Notification that we've started an update frame/iteration
+	 */
+	void startFrame() {
+		oldPosition = new Vector2f(getPosition());
+		oldRotation = getRotation();
+		hitByAnother = false;
+		hitCount = 0;
+	}
+	
+	/**
+	 * Notification that this body collided with another
+	 * 
+	 * @param other The other body that this body collided with
+	 */
+	public void collided(Body other) {
+		if (!restingBodyDetection) {
+			return;
+		}
+		
+		if (isResting()) {
+			if ((!other.isResting())) {
+				if (other.getVelocity().lengthSquared() > hitTolerance) {
+					hitByAnother = true;
+					setMass(originalMass);
+				}
+			} 
+		}
+		hitCount++;
+	}
+
+	/**
+	 * Notification that we've ended an update frame/iteration
+	 */
+	public void endFrame() {
+		if (hitCount == 0) {
+			isResting = false;
+			setMass(originalMass);
+		} else {
+			if (!hitByAnother) {
+				newPosition = new Vector2f(getPosition());
+				if (true
+					&& (newPosition.distanceSquared(oldPosition) < positionTolerance)
+//					&& (velocity.lengthSquared() <= positionTolerance)
+//					&& (biasedVelocity.lengthSquared() < positionTolerance)
+//				    && (Math.abs(oldRotation - getRotation()) < rotationTolerance)
+				    && (Math.abs(angularVelocity) <= rotationTolerance) 
+//				    && (Math.abs(biasedAngularVelocity) < rotationTolerance)
+//				    && (torque < rotationTolerance)
+//				    && (force.lengthSquared() < positionTolerance)
+				    )
+				{
+					isResting = true;
+					setMass(INFINITE_MASS);
+					velocity.set(0.0f, 0.0f);
+					biasedVelocity.set(0,0);
+					angularVelocity = 0.0f;
+					biasedAngularVelocity = 0;
+					force.set(0.0f, 0.0f);
+					torque = 0.0f;
+				}
+			} else {
+				isResting = false;
+				setMass(originalMass);
+			}
+		}
+	}
+	
+	/**
+	 * Check if this body has been detected as resting and hence is considered
+	 * static.
+	 * 
+	 * @return True if the body is considered static since it's resting
+	 */
+	public boolean isResting() {
+		return isResting;
+	}
+	
+	/**
+	 * Force this body into resting or not resting mode.
+	 * 
+	 * @param isResting True if this body should be seen as resting
+	 */
+	public void setIsResting(boolean isResting) {
+		if (this.isResting && !isResting) {
+			setMass(originalMass);
+		}
+		this.isResting = isResting;
 	}
 	
 	/**
@@ -306,6 +433,15 @@ public strictfp class Body {
 		surfaceFriction = 0.2f;
 
 		this.shape = shape;
+		setMass(m);
+	}
+
+	/**
+	 * Set the mass of the body
+	 * 
+	 * @param m The new mass of the body
+	 */
+	private void setMass(float m) {
 		mass = m;
 
 		if (mass < INFINITE_MASS)
@@ -323,7 +459,7 @@ public strictfp class Body {
 			invI = 0.0f;
 		}
 	}
-
+	
 	/**
 	 * Set the friction on the surface of this body
 	 * 
@@ -719,5 +855,4 @@ public strictfp class Body {
 	public void removeBit(long bitmask) {
 		this.bitmask -= bitmask & this.bitmask;
 	}
-
 }

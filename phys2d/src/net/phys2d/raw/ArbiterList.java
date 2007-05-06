@@ -92,7 +92,11 @@ public class ArbiterList {
 	 * @param arbiter The arbiter ot remove from the list
 	 */
 	void remove(Arbiter arbiter) {
-		elements.remove(arbiter);
+		if (!elements.contains(arbiter)) {
+			return;
+		}
+		elements.set(elements.indexOf(arbiter), elements.get(elements.size()-1));
+		elements.remove(elements.size()-1);
 	}
 	
 	/**

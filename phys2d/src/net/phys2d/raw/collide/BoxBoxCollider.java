@@ -91,6 +91,11 @@ public strictfp class BoxBoxCollider implements Collider {
 	/** The identifier indicating the forth edge collides */
 	public static final int EDGE4 = 4;
 
+	/** Temp vector */
+	private static Vector2f hA = new Vector2f();
+	/** Temp vector */
+	private static Vector2f hB = new Vector2f();
+	
 	/**
 	 * A simple structure describe a vertex against which the
 	 * shape should be clipped
@@ -246,9 +251,6 @@ public strictfp class BoxBoxCollider implements Collider {
 		c[1].v = MathUtil.mul(rot,c[1].v);
 		c[1].v.add(pos);
 	}
-	
-	private static Vector2f hA = new Vector2f();
-	private static Vector2f hB = new Vector2f();
 	
 	/**
 	 * @see net.phys2d.raw.collide.Collider#collide(net.phys2d.raw.Contact[], net.phys2d.raw.Body, net.phys2d.raw.Body)
