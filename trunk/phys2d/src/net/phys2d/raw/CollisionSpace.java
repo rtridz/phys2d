@@ -165,6 +165,9 @@ public class CollisionSpace implements CollisionContext {
 				
 				if (newArb.getNumContacts() > 0)
 				{
+					bi.collided(bj);
+					bj.collided(bi);
+					
 					if (arbiters.contains(newArb)) {
 						int index = arbiters.indexOf(newArb);
 						Arbiter arb = arbiters.get(index);

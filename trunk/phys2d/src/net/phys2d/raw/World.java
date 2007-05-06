@@ -60,6 +60,15 @@ public strictfp class World extends CollisionSpace {
 	private int iterations;
 	/** The damping in effect in the system */
 	private float damping = 1;
+	/** True if resting body detection is turned on */
+	private boolean restingBodyDetection = false;
+	/** The velocity a body hitting a resting body has to have to consider moving it */
+	private float hitTolerance; 
+	/** The amount a body has to rotate for it to be considered non-resting */
+	private float rotationTolerance; 
+	/** The amoutn a body has to move for it to be considered non-resting */
+	private float positionTolerance; 
+	
 	/**
 	 * Create a new physics model World
 	 * 
@@ -70,7 +79,7 @@ public strictfp class World extends CollisionSpace {
 	public World(Vector2f gravity, int iterations) {
 		this(gravity, iterations, new BruteCollisionStrategy());
 	}
-	
+
 	/**
 	 * Create a new physics model World
 	 * 
@@ -86,6 +95,37 @@ public strictfp class World extends CollisionSpace {
 		this.gravity = gravity;
 		this.iterations = iterations;
 
+	}
+	
+	/**
+	 * Enable resting body detection.
+	 * 
+	 * @param hitTolerance The velocity a body hitting a resting body has to have to consider moving it
+	 * @param rotationTolerance The amount a body has to rotate for it to be considered non-resting
+	 * @param positionTolerance The amoutn a body has to move for it to be considered non-resting
+	 */
+	public void enableRestingBodyDetection(float hitTolerance, float rotationTolerance, float positionTolerance) {
+		this.hitTolerance = hitTolerance;
+		this.rotationTolerance = rotationTolerance;
+		this.positionTolerance = positionTolerance;
+		restingBodyDetection = true;
+	}
+	
+	/**
+	 * Disable resting body detection on the world
+	 */
+	public void disableRestingBodyDetection() {
+		restingBodyDetection = false;
+	}
+	
+	/**
+	 * Reset all dynamic bodies to indicate they are no longer resting. Useful when manually
+	 * changing the state of the world and then expecting normal results
+	 */
+	public void clearRestingState() {
+		for (int i=0;i<bodies.size();i++) {
+			bodies.get(i).setIsResting(false);
+		}
 	}
 	
 	/**
@@ -175,6 +215,14 @@ public strictfp class World extends CollisionSpace {
 	public void step(float dt) {
 		float invDT = dt > 0.0f ? 1.0f / dt : 0.0f;
 
+		if (restingBodyDetection) {
+			for (int i = 0; i < bodies.size(); ++i)
+			{
+				Body b = bodies.get(i);
+				b.startFrame();
+			}
+		}
+		
 		broadPhase(dt);
 
 		for (int i = 0; i < bodies.size(); ++i)
@@ -184,6 +232,9 @@ public strictfp class World extends CollisionSpace {
 			if (b.getInvMass() == 0.0f) {
 				continue;
 			}
+			if (b.isResting() && restingBodyDetection) {
+				continue;
+			}
 
 			Vector2f temp = new Vector2f(b.getForce());
 			temp.scale(b.getInvMass());
@@ -191,6 +242,7 @@ public strictfp class World extends CollisionSpace {
 				temp.add(gravity);
 			}
 			temp.scale(dt);
+			
 			b.adjustVelocity(temp);
 			
 			Vector2f damping = new Vector2f(b.getVelocity());
@@ -203,7 +255,9 @@ public strictfp class World extends CollisionSpace {
 
 		for (int i=0;i<arbiters.size();i++) {
 			Arbiter arb = arbiters.get(i);
-			arb.preStep(invDT, dt, damping);
+			if (!restingBodyDetection || !arb.hasRestingPair()) {
+				arb.preStep(invDT, dt, damping);
+			}
 		}
 
 		for (int i = 0; i < joints.size(); ++i) {
@@ -215,7 +269,12 @@ public strictfp class World extends CollisionSpace {
 		{
 			for (int k=0;k<arbiters.size();k++) {
 				Arbiter arb = arbiters.get(k);
-				arb.applyImpulse();
+				if (!restingBodyDetection || !arb.hasRestingPair()) {
+					arb.applyImpulse();
+				} else {
+					arb.getBody1().collided(arb.getBody2());
+					arb.getBody2().collided(arb.getBody1());
+				}
 			}
 			
 			for (int k=0;k<joints.size();++k) {
@@ -228,6 +287,15 @@ public strictfp class World extends CollisionSpace {
 		{
 			Body b = bodies.get(i);
 
+			if (b.getInvMass() == 0.0f) {
+				continue;
+			}
+			if (restingBodyDetection) {
+				if (b.isResting()) {
+					continue;
+				}
+			}
+			
 			b.adjustPosition(b.getVelocity(), dt);
 			b.adjustPosition(b.getBiasedVelocity(), dt);
 			
@@ -237,6 +305,14 @@ public strictfp class World extends CollisionSpace {
 			b.resetBias();
 			b.setForce(0,0);
 			b.setTorque(0);
+		}
+
+		if (restingBodyDetection) {
+			for (int i=0;i < bodies.size(); ++i)
+			{
+				Body b = bodies.get(i);
+				b.endFrame();
+			}
 		}
 	}
 	
@@ -287,5 +363,13 @@ public strictfp class World extends CollisionSpace {
 		}
 		
 		return total;
+	}
+
+	/**
+	 * @see net.phys2d.raw.CollisionSpace#add(net.phys2d.raw.Body)
+	 */
+	public void add(Body body) {                         
+		body.configureRestingBodyDetection(hitTolerance, rotationTolerance, positionTolerance);
+		super.add(body);
 	}
 }

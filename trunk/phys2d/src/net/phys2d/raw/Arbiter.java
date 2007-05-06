@@ -88,6 +88,15 @@ public strictfp class Arbiter {
 	}
 	
 	/**
+	 * Check if this arbiter has two bodies that are resting
+	 * 
+	 * @return True if the arbiter has two bodies that are "at rest"
+	 */
+	public boolean hasRestingPair() {
+		return body1.isResting() && body2.isResting();
+	}
+	
+	/**
 	 * Perform the collision analysis between the two bodies 
 	 * arbitrated
 	 * 
@@ -287,132 +296,136 @@ public strictfp class Arbiter {
 		}
 	}
 	
-	private static Vector2f r1 = new Vector2f();
-	private static Vector2f r2 = new Vector2f();
-	private static Vector2f relativeVelocity = new Vector2f();
-	private static Vector2f impulse = new Vector2f();
-	private static Vector2f Pb = new Vector2f();
-	private static Vector2f tmp = new Vector2f();
-	
+//	private static Vector2f r1 = new Vector2f();
+//	private static Vector2f r2 = new Vector2f();
+//	private static Vector2f relativeVelocity = new Vector2f();
+//	private static Vector2f impulse = new Vector2f();
+//	private static Vector2f Pb = new Vector2f();
+//	private static Vector2f tmp = new Vector2f();
+//	
+//	/**
+//	 * Apply the impulse accumlated at the contact points maintained
+//	 * by this arbiter.
+//	 */
+//	void applyImpulse() {
+//		Body b1 = body1;
+//		Body b2 = body2;
+//		
+//		for (int i = 0; i < numContacts; ++i)
+//		{
+//			Contact c = contacts[i];
+//			
+//			r1.set(c.position);
+//			r1.sub(b1.getPosition());
+//			r2.set(c.position);
+//			r2.sub(b2.getPosition());
+//
+//			// Relative velocity at contact
+//			relativeVelocity.set(b2.getVelocity());
+//			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
+//			relativeVelocity.sub(b1.getVelocity());
+//			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
+//			
+//			// Compute normal impulse with bias.
+//			float vn = relativeVelocity.dot(c.normal);
+//			
+//			// bias caculations are now handled seperately hence we only
+//			// handle the real impulse caculations here
+//			//float normalImpulse = c.massNormal * ((c.restitution - vn) + c.bias);
+//			float normalImpulse = c.massNormal * (c.restitution - vn);
+//			
+//			// Clamp the accumulated impulse
+//			float oldNormalImpulse = c.accumulatedNormalImpulse;
+//			c.accumulatedNormalImpulse = Math.max(oldNormalImpulse + normalImpulse, 0.0f);
+//			normalImpulse = c.accumulatedNormalImpulse - oldNormalImpulse;
+//			
+//			if (normalImpulse != 0) {
+//				// Apply contact impulse
+//				impulse.set(c.normal);
+//				impulse.scale(normalImpulse);
+//				
+//				tmp.set(impulse);
+//				tmp.scale(-b1.getInvMass());
+//				b1.adjustVelocity(tmp);
+//				b1.adjustAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, impulse)));
+//	
+//				tmp.set(impulse);
+//				tmp.scale(b2.getInvMass());
+//				b2.adjustVelocity(tmp);
+//				b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
+//			}
+//			
+//			// Compute bias impulse
+//			// NEW STUFF FOR SEPERATING BIAS
+//			relativeVelocity.set(b2.getBiasedVelocity());
+//			relativeVelocity.add(MathUtil.cross(b2.getBiasedAngularVelocity(), r2));
+//			relativeVelocity.sub(b1.getBiasedVelocity());
+//			relativeVelocity.sub(MathUtil.cross(b1.getBiasedAngularVelocity(), r1));
+//			float vnb = relativeVelocity.dot(c.normal);
+//
+//			float biasImpulse = c.massNormal * (-vnb + c.bias);
+//			float oldBiasImpulse = c.biasImpulse;
+//			c.biasImpulse = Math.max(oldBiasImpulse + biasImpulse, 0.0f);
+//			biasImpulse = c.biasImpulse - oldBiasImpulse;
+//
+//			if (biasImpulse != 0) {
+//				Pb.set(c.normal);
+//				Pb.scale(biasImpulse);
+//				
+//				tmp.set(Pb);
+//				tmp.scale(-b1.getInvMass());
+//				b1.adjustBiasedVelocity(tmp);
+//				b1.adjustBiasedAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, Pb)));
+//	
+//				tmp.set(Pb);
+//				tmp.scale(b2.getInvMass());
+//				b2.adjustBiasedVelocity(tmp);
+//				b2.adjustBiasedAngularVelocity((b2.getInvI() * MathUtil.cross(r2, Pb)));
+//			}
+//			// END NEW STUFF
+//			
+//			//
+//			// Compute friction (tangent) impulse
+//			//
+//			float maxTangentImpulse = friction * c.accumulatedNormalImpulse;
+//
+//			// Relative velocity at contact
+//			relativeVelocity.set(b2.getVelocity());
+//			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
+//			relativeVelocity.sub(b1.getVelocity());
+//			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
+//			
+//			Vector2f tangent = MathUtil.cross(c.normal, 1.0f);
+//			float vt = relativeVelocity.dot(tangent);
+//			float tangentImpulse = c.massTangent * (-vt);
+//
+//			// Clamp friction
+//			float oldTangentImpulse = c.accumulatedTangentImpulse;
+//			c.accumulatedTangentImpulse = MathUtil.clamp(oldTangentImpulse + tangentImpulse, -maxTangentImpulse, maxTangentImpulse);
+//			tangentImpulse = c.accumulatedTangentImpulse - oldTangentImpulse;
+//
+//			// Apply contact impulse
+//			if ((tangentImpulse > 0.1f) || (tangentImpulse < -0.1f)) {
+//				impulse = MathUtil.scale(tangent, tangentImpulse);
+//	
+//				tmp.set(impulse);
+//				tmp.scale(-b1.getInvMass());
+//				b1.adjustVelocity(tmp);
+//				b1.adjustAngularVelocity(-b1.getInvI() * MathUtil.cross(r1, impulse));
+//	
+//				tmp.set(impulse);
+//				tmp.scale(b2.getInvMass());
+//				b2.adjustVelocity(tmp);
+//				b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
+//			}
+//		}
+//	}
+
 	/**
 	 * Apply the impulse accumlated at the contact points maintained
 	 * by this arbiter.
 	 */
 	void applyImpulse() {
-		Body b1 = body1;
-		Body b2 = body2;
-		
-		for (int i = 0; i < numContacts; ++i)
-		{
-			Contact c = contacts[i];
-			
-			r1.set(c.position);
-			r1.sub(b1.getPosition());
-			r2.set(c.position);
-			r2.sub(b2.getPosition());
-
-			// Relative velocity at contact
-			relativeVelocity.set(b2.getVelocity());
-			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
-			relativeVelocity.sub(b1.getVelocity());
-			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
-			
-			// Compute normal impulse with bias.
-			float vn = relativeVelocity.dot(c.normal);
-			
-			// bias caculations are now handled seperately hence we only
-			// handle the real impulse caculations here
-			//float normalImpulse = c.massNormal * ((c.restitution - vn) + c.bias);
-			float normalImpulse = c.massNormal * (c.restitution - vn);
-			
-			// Clamp the accumulated impulse
-			float oldNormalImpulse = c.accumulatedNormalImpulse;
-			c.accumulatedNormalImpulse = Math.max(oldNormalImpulse + normalImpulse, 0.0f);
-			normalImpulse = c.accumulatedNormalImpulse - oldNormalImpulse;
-			
-			if (normalImpulse != 0) {
-				// Apply contact impulse
-				impulse.set(c.normal);
-				impulse.scale(normalImpulse);
-				
-				tmp.set(impulse);
-				tmp.scale(-b1.getInvMass());
-				b1.adjustVelocity(tmp);
-				b1.adjustAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, impulse)));
-	
-				tmp.set(impulse);
-				tmp.scale(b2.getInvMass());
-				b2.adjustVelocity(tmp);
-				b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
-			}
-			
-			// Compute bias impulse
-			// NEW STUFF FOR SEPERATING BIAS
-			relativeVelocity.set(b2.getBiasedVelocity());
-			relativeVelocity.add(MathUtil.cross(b2.getBiasedAngularVelocity(), r2));
-			relativeVelocity.sub(b1.getBiasedVelocity());
-			relativeVelocity.sub(MathUtil.cross(b1.getBiasedAngularVelocity(), r1));
-			float vnb = relativeVelocity.dot(c.normal);
-
-			float biasImpulse = c.massNormal * (-vnb + c.bias);
-			float oldBiasImpulse = c.biasImpulse;
-			c.biasImpulse = Math.max(oldBiasImpulse + biasImpulse, 0.0f);
-			biasImpulse = c.biasImpulse - oldBiasImpulse;
-
-			if (biasImpulse != 0) {
-				Pb.set(c.normal);
-				Pb.scale(biasImpulse);
-				
-				tmp.set(Pb);
-				tmp.scale(-b1.getInvMass());
-				b1.adjustBiasedVelocity(tmp);
-				b1.adjustBiasedAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, Pb)));
-	
-				tmp.set(Pb);
-				tmp.scale(b2.getInvMass());
-				b2.adjustBiasedVelocity(tmp);
-				b2.adjustBiasedAngularVelocity((b2.getInvI() * MathUtil.cross(r2, Pb)));
-			}
-			// END NEW STUFF
-			
-			//
-			// Compute friction (tangent) impulse
-			//
-			float maxTangentImpulse = friction * c.accumulatedNormalImpulse;
-
-			// Relative velocity at contact
-			relativeVelocity.set(b2.getVelocity());
-			relativeVelocity.add(MathUtil.cross(b2.getAngularVelocity(), r2));
-			relativeVelocity.sub(b1.getVelocity());
-			relativeVelocity.sub(MathUtil.cross(b1.getAngularVelocity(), r1));
-			
-			Vector2f tangent = MathUtil.cross(c.normal, 1.0f);
-			float vt = relativeVelocity.dot(tangent);
-			float tangentImpulse = c.massTangent * (-vt);
-
-			// Clamp friction
-			float oldTangentImpulse = c.accumulatedTangentImpulse;
-			c.accumulatedTangentImpulse = MathUtil.clamp(oldTangentImpulse + tangentImpulse, -maxTangentImpulse, maxTangentImpulse);
-			tangentImpulse = c.accumulatedTangentImpulse - oldTangentImpulse;
-
-			// Apply contact impulse
-			if ((tangentImpulse > 0.1f) || (tangentImpulse < -0.1f)) {
-				impulse = MathUtil.scale(tangent, tangentImpulse);
-	
-				tmp.set(impulse);
-				tmp.scale(-b1.getInvMass());
-				b1.adjustVelocity(tmp);
-				b1.adjustAngularVelocity(-b1.getInvI() * MathUtil.cross(r1, impulse));
-	
-				tmp.set(impulse);
-				tmp.scale(b2.getInvMass());
-				b2.adjustVelocity(tmp);
-				b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
-			}
-		}
-	}
-	
-	void applyImpulse2() {
 		Body b1 = body1;
 		Body b2 = body2;
 		

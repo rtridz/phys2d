@@ -218,10 +218,20 @@ public strictfp class Vector2f implements ROVector2f {
 	 * @return The distance to the other point
 	 */
 	public float distance(ROVector2f other) {
+		return (float) Math.sqrt(distanceSquared(other));
+	}
+
+	/**
+	 * Get the distance squared from this point to another
+	 * 
+	 * @param other The other point we're measuring to
+	 * @return The distance to the other point
+	 */
+	public float distanceSquared(ROVector2f other) {
 		float dx = other.getX() - getX();
 		float dy = other.getY() - getY();
 		
-		return (float) Math.sqrt((dx*dx)+(dy*dy));
+		return (dx*dx)+(dy*dy);
 	}
 	
 	/**

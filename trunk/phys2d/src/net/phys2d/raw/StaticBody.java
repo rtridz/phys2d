@@ -67,4 +67,11 @@ public strictfp class StaticBody extends Body {
 	public StaticBody(String name, Shape shape) {
 		super(name, shape, Body.INFINITE_MASS);
 	}
+	
+	/**
+	 * @see net.phys2d.raw.Body#isResting()
+	 */
+	public boolean isResting() {
+		return true;
+	}
 }
