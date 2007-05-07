@@ -136,6 +136,8 @@ public strictfp class Body {
 	private float positionTolerance; 
 	/** The list of bodies this body touches */
 	private BodyList touching = new BodyList();
+	/** True if this body is touching a static */
+	private boolean touchingStatic = false;
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -272,11 +274,12 @@ public strictfp class Body {
 		if (hitCount == 0) {
 			isResting = false;
 			setMass(originalMass);
+			touchingStatic = false;
 		} else {
 			if (!hitByAnother) {
 				newPosition = new Vector2f(getPosition());
 				if (true
-					&& (newPosition.distanceSquared(oldPosition) < positionTolerance)
+					&& (newPosition.distanceSquared(oldPosition) <= positionTolerance)
 //					&& (velocity.lengthSquared() <= positionTolerance)
 //					&& (biasedVelocity.lengthSquared() < positionTolerance)
 //				    && (Math.abs(oldRotation - getRotation()) < rotationTolerance)
@@ -286,25 +289,28 @@ public strictfp class Body {
 //				    && (force.lengthSquared() < positionTolerance)
 				    )
 				{
-					isResting = true;
-					setMass(INFINITE_MASS);
-					velocity.set(0.0f, 0.0f);
-					biasedVelocity.set(0,0);
-					angularVelocity = 0.0f;
-					biasedAngularVelocity = 0;
-					force.set(0.0f, 0.0f);
-					torque = 0.0f;
+					if (!touchingStatic) {
+						touchingStatic = isTouchingStatic(new ArrayList());
+					}
+					if (touchingStatic) {
+						isResting = true;
+						setMass(INFINITE_MASS);
+						velocity.set(0.0f, 0.0f);
+						biasedVelocity.set(0,0);
+						angularVelocity = 0.0f;
+						biasedAngularVelocity = 0;
+						force.set(0.0f, 0.0f);
+						torque = 0.0f;
+					}
 				}
 			} else {
 				isResting = false;
 				setMass(originalMass);
 			}
 			
-			if (isResting) {
-				if (!isTouchingStatic(new ArrayList())) {
-					isResting = false;
-					setMass(originalMass);
-				}
+			if ((newPosition.distanceSquared(oldPosition) > positionTolerance)
+				&& (Math.abs(angularVelocity) > rotationTolerance)) {
+				touchingStatic = false;
 			}
 		}
 		
@@ -335,7 +341,6 @@ public strictfp class Body {
 				break;
 			}
 		}
-		path.remove(this);
 		
 		return result;
 	}
@@ -394,8 +399,6 @@ public strictfp class Body {
 			list.add(body);
 			body.getConnected(list, path, stopAtStatic);
 		}
-		
-		path.remove(this);
 	}
 	
 	/**
