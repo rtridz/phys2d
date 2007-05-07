@@ -429,6 +429,7 @@ public strictfp class Body {
 		if (this.isResting && !isResting) {
 			setMass(originalMass);
 		}
+		this.touchingStatic = false;
 		this.isResting = isResting;
 	}
 	
