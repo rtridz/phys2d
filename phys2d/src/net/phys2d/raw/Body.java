@@ -357,28 +357,41 @@ public strictfp class Body {
 	 * @return The list of bodies this body touches
 	 */
 	public BodyList getConnected() {
+		return getConnected(false);
+	}
+	/**
+	 * Get the list of bodies that this body is connected to. Only works if 
+	 * resting body detection is turned on
+	 * 
+	 * @param stopAtStatic True if we should stop traversing and looking for elements one you find a static one
+	 * @return The list of bodies this body touches
+	 */
+	public BodyList getConnected(boolean stopAtStatic) {
 		BodyList connected = new BodyList();
-		getConnected(connected, new ArrayList());
+		getConnected(connected, new ArrayList(), stopAtStatic);
 		
 		return connected;
 	}
-	
 	/**
 	 * Get the bodies connected to this one
 	 * 
+	 * @param stopAtStatic True if we should stop traversing and looking for elements one you find a static one
 	 * @param list The list we're building up
-	 * @param path
+	 * @param path The list of elements we passed to get here
 	 */
-	private void getConnected(BodyList list, ArrayList path) {
+	private void getConnected(BodyList list, ArrayList path, boolean stopAtStatic) {
 		path.add(this);
 		for (int i=0;i<touching.size();i++) {
 			Body body = touching.get(i);
 			if (path.contains(body)) {
 				continue;
 			}
+			if (body.isStatic() && stopAtStatic) {
+				continue;
+			}
 			
 			list.add(body);
-			body.getConnected(list, path);
+			body.getConnected(list, path, stopAtStatic);
 		}
 		
 		path.remove(this);
