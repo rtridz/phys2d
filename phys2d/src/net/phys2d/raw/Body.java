@@ -276,8 +276,8 @@ public strictfp class Body {
 			setMass(originalMass);
 			touchingStatic = false;
 		} else {
+			newPosition = new Vector2f(getPosition());
 			if (!hitByAnother) {
-				newPosition = new Vector2f(getPosition());
 				if (true
 					&& (newPosition.distanceSquared(oldPosition) <= positionTolerance)
 //					&& (velocity.lengthSquared() <= positionTolerance)
