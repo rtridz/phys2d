@@ -114,8 +114,6 @@ public strictfp class Body {
 	private Object userData = null;
 	/** The old position */
 	private Vector2f oldPosition;
-	/** The old position */
-	private float oldRotation;
 	/** The new position */
 	private Vector2f newPosition;
 	/** True if we've been hit by another this frame */
@@ -236,7 +234,6 @@ public strictfp class Body {
 	 */
 	void startFrame() {
 		oldPosition = new Vector2f(getPosition());
-		oldRotation = getRotation();
 		hitByAnother = false;
 		hitCount = 0;
 		touching.clear();
