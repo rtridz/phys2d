@@ -359,6 +359,7 @@ public strictfp class Body {
 	public BodyList getConnected() {
 		return getConnected(false);
 	}
+	
 	/**
 	 * Get the list of bodies that this body is connected to. Only works if 
 	 * resting body detection is turned on

@@ -170,6 +170,20 @@ public strictfp class World extends CollisionSpace {
 	}
 	
 	/**
+	 * Clear any arbiters in place for the given body
+	 * 
+	 * @param b The body whose arbiters should be removed
+	 */
+	public void clearArbiters(Body b) {
+		for (int i=0;i<arbiters.size();i++) {
+			if (arbiters.get(i).concerns(b)) {
+				arbiters.remove(arbiters.get(i));
+				i--;
+			}
+		}
+	}
+	
+	/**
 	 * Add a joint to the simulation
 	 * 
 	 * @param joint The joint to be added 
