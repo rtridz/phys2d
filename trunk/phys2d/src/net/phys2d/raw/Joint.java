@@ -1,7 +1,7 @@
 package net.phys2d.raw;
 
 /**
- * Oops. Forgot to document this one.
+ * A joint connecting two bodies
  * 
  * @author Kevin Glass
  */
