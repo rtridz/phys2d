@@ -235,6 +235,11 @@ public strictfp class World extends CollisionSpace {
 				Body b = bodies.get(i);
 				b.startFrame();
 			}
+			for (int i = 0; i < joints.size(); ++i) {
+				Joint j = joints.get(i);
+				j.getBody1().setIsResting(false);
+				j.getBody2().setIsResting(false);
+			}
 		}
 		
 		broadPhase(dt);
