@@ -136,6 +136,8 @@ public strictfp class Body {
 	private BodyList touching = new BodyList();
 	/** True if this body is touching a static */
 	private boolean touchingStatic = false;
+	/** Number of bodies we're touching */
+	private int touchingCount;
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -268,10 +270,11 @@ public strictfp class Body {
 	 * Notification that we've ended an update frame/iteration
 	 */
 	public void endFrame() {
-		if (hitCount == 0) {
+		if ((hitCount == 0) || (touchingCount != touching.size())) {
 			isResting = false;
 			setMass(originalMass);
 			touchingStatic = false;
+			touchingCount = touching.size();
 		} else {
 			newPosition = new Vector2f(getPosition());
 			if (!hitByAnother) {
