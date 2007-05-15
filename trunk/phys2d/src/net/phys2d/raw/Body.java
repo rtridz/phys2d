@@ -280,8 +280,8 @@ public strictfp class Body {
 			if (!hitByAnother) {
 				if (true
 					&& (newPosition.distanceSquared(oldPosition) <= positionTolerance)
-//					&& (velocity.lengthSquared() <= positionTolerance)
-//					&& (biasedVelocity.lengthSquared() < positionTolerance)
+					&& (velocity.lengthSquared() <= 0.001f)
+					&& (biasedVelocity.lengthSquared() <= 0.001f)
 //				    && (Math.abs(oldRotation - getRotation()) < rotationTolerance)
 				    && (Math.abs(angularVelocity) <= rotationTolerance) 
 //				    && (Math.abs(biasedAngularVelocity) < rotationTolerance)
