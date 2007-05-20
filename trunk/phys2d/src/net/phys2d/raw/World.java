@@ -220,6 +220,26 @@ public strictfp class World extends CollisionSpace {
 	}
 	
 	/**
+	 * Get the list of bodies that should be considered active at this time. Sub-classes
+	 * can override to incur spatial culling
+	 * 
+	 * @return The list of bodies that should be considered active at this point in time
+	 */
+	protected BodyList getActiveBodies() {
+		return bodies;
+	}
+
+	/**
+	 * Get the list of joints that should be considered active at this time. Sub-classes
+	 * can override to incur spatial culling
+	 * 
+	 * @return The list of joints that should be considered active at this point in time
+	 */
+	protected JointList getActiveJoints() {
+		return joints;
+	}
+	
+	/**
 	 * Step the simulation. Currently anything other than 1/60f as a 
 	 * step leads to unpredictable results - hence the default step 
 	 * fixes us to this step
@@ -227,6 +247,8 @@ public strictfp class World extends CollisionSpace {
 	 * @param dt The amount of time to step
 	 */
 	public void step(float dt) {
+		BodyList bodies = getActiveBodies();
+		
 		float invDT = dt > 0.0f ? 1.0f / dt : 0.0f;
 
 		if (restingBodyDetection) {
