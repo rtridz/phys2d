@@ -63,7 +63,7 @@ public class JointList {
 	 * 
 	 * @param joint The joint to add
 	 */
-	void add(Joint joint) {
+	public void add(Joint joint) {
 		elements.add(joint);
 	}
 	
@@ -81,7 +81,7 @@ public class JointList {
 	 * 
 	 * @param joint The joint to remove
 	 */
-	void remove(Joint joint) {
+	public void remove(Joint joint) {
 		elements.remove(joint);
 	}
 	

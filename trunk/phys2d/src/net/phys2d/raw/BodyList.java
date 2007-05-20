@@ -72,7 +72,7 @@ public class BodyList {
 	 * 
 	 * @param body The body to add
 	 */
-	protected void add(Body body) {
+	public void add(Body body) {
 		elements.add(body);
 	}
 	
