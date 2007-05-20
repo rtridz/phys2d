@@ -54,7 +54,7 @@ public class JointList {
 	/**
 	 * Create an empty list
 	 */
-	JointList() {
+	public JointList() {
 		
 	}
 	

@@ -54,7 +54,7 @@ public class BodyList {
 	/**
 	 * Create an empty list
 	 */
-	protected BodyList() {
+	public BodyList() {
 		
 	}
 	
