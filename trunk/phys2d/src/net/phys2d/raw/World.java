@@ -248,6 +248,7 @@ public strictfp class World extends CollisionSpace {
 	 */
 	public void step(float dt) {
 		BodyList bodies = getActiveBodies();
+		JointList joints = getActiveJoints();
 		
 		float invDT = dt > 0.0f ? 1.0f / dt : 0.0f;
 
