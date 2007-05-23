@@ -59,6 +59,16 @@ public class JointList {
 	}
 	
 	/**
+	 * Check if a given joint in container within this list
+	 * 
+	 * @param joint The joint to check for
+	 * @return True if the joint is contained in this list
+	 */
+	public boolean contains(Joint joint) {
+		return elements.contains(joint);
+	}
+	
+	/**
 	 * Add a joint to the list
 	 * 
 	 * @param joint The joint to add
