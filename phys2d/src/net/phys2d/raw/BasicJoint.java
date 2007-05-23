@@ -169,6 +169,10 @@ public strictfp class BasicJoint implements Joint {
 		relaxation = 1.0f;
 	}
 
+	Matrix2f K1 = new Matrix2f();
+	Matrix2f K2 = new Matrix2f();
+	Matrix2f K3 = new Matrix2f();
+	
 	/**
 	 * Precaculate everything and apply initial impulse before the
 	 * simulation step takes place
@@ -187,15 +191,12 @@ public strictfp class BasicJoint implements Joint {
 		// invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
 		//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
 		//        [    0     1/m1+1/m2]           [-r1.x*r1.y r1.x*r1.x]           [-r1.x*r1.y r1.x*r1.x]
-		Matrix2f K1 = new Matrix2f();
 		K1.col1.x = body1.getInvMass() + body2.getInvMass();	K1.col2.x = 0.0f;
 		K1.col1.y = 0.0f;								K1.col2.y = body1.getInvMass() + body2.getInvMass();
 
-		Matrix2f K2 = new Matrix2f();
 		K2.col1.x =  body1.getInvI() * r1.y * r1.y;		K2.col2.x = -body1.getInvI() * r1.x * r1.y;
 		K2.col1.y = -body1.getInvI() * r1.x * r1.y;		K2.col2.y =  body1.getInvI() * r1.x * r1.x;
 
-		Matrix2f K3 = new Matrix2f();
 		K3.col1.x =  body2.getInvI() * r2.y * r2.y;		K3.col2.x = -body2.getInvI() * r2.x * r2.y;
 		K3.col1.y = -body2.getInvI() * r2.x * r2.y;		K3.col2.y =  body2.getInvI() * r2.x * r2.x;
 

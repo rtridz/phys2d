@@ -325,6 +325,7 @@ public strictfp class World extends CollisionSpace {
 			}
 		}
 		
+		
 		for (int i=0;i < bodies.size(); ++i)
 		{
 			Body b = bodies.get(i);
