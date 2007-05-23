@@ -169,10 +169,6 @@ public strictfp class BasicJoint implements Joint {
 		relaxation = 1.0f;
 	}
 
-	Matrix2f K1 = new Matrix2f();
-	Matrix2f K2 = new Matrix2f();
-	Matrix2f K3 = new Matrix2f();
-	
 	/**
 	 * Precaculate everything and apply initial impulse before the
 	 * simulation step takes place
@@ -191,12 +187,15 @@ public strictfp class BasicJoint implements Joint {
 		// invM = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
 		//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
 		//        [    0     1/m1+1/m2]           [-r1.x*r1.y r1.x*r1.x]           [-r1.x*r1.y r1.x*r1.x]
+		Matrix2f K1 = new Matrix2f();
 		K1.col1.x = body1.getInvMass() + body2.getInvMass();	K1.col2.x = 0.0f;
 		K1.col1.y = 0.0f;								K1.col2.y = body1.getInvMass() + body2.getInvMass();
 
+		Matrix2f K2 = new Matrix2f();
 		K2.col1.x =  body1.getInvI() * r1.y * r1.y;		K2.col2.x = -body1.getInvI() * r1.x * r1.y;
 		K2.col1.y = -body1.getInvI() * r1.x * r1.y;		K2.col2.y =  body1.getInvI() * r1.x * r1.x;
 
+		Matrix2f K3 = new Matrix2f();
 		K3.col1.x =  body2.getInvI() * r2.y * r2.y;		K3.col2.x = -body2.getInvI() * r2.x * r2.y;
 		K3.col1.y = -body2.getInvI() * r2.x * r2.y;		K3.col2.y =  body2.getInvI() * r2.x * r2.x;
 
@@ -217,15 +216,19 @@ public strictfp class BasicJoint implements Joint {
 		// Apply accumulated impulse.
 		accumulatedImpulse.scale(relaxation);
 		
-		Vector2f accum1 = new Vector2f(accumulatedImpulse);
-		accum1.scale(-body1.getInvMass());
-		body1.adjustVelocity(accum1);
-		body1.adjustAngularVelocity(-(body1.getInvI() * MathUtil.cross(r1, accumulatedImpulse)));
+		if (!body1.isStatic()) {
+			Vector2f accum1 = new Vector2f(accumulatedImpulse);
+			accum1.scale(-body1.getInvMass());
+			body1.adjustVelocity(accum1);
+			body1.adjustAngularVelocity(-(body1.getInvI() * MathUtil.cross(r1, accumulatedImpulse)));
+		}
 
-		Vector2f accum2 = new Vector2f(accumulatedImpulse);
-		accum2.scale(body2.getInvMass());
-		body2.adjustVelocity(accum2);
-		body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, accumulatedImpulse));
+		if (!body2.isStatic()) {
+			Vector2f accum2 = new Vector2f(accumulatedImpulse);
+			accum2.scale(body2.getInvMass());
+			body2.adjustVelocity(accum2);
+			body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2, accumulatedImpulse));
+		}
 	}
 	
 	/**
@@ -245,16 +248,20 @@ public strictfp class BasicJoint implements Joint {
 	    
 		Vector2f impulse = MathUtil.mul(M, dv);
 
-		Vector2f delta1 = new Vector2f(impulse);
-		delta1.scale(-body1.getInvMass());
-		body1.adjustVelocity(delta1);
-		body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1,impulse));
+		if (!body1.isStatic()) {
+			Vector2f delta1 = new Vector2f(impulse);
+			delta1.scale(-body1.getInvMass());
+			body1.adjustVelocity(delta1);
+			body1.adjustAngularVelocity(-body1.getInvI() * MathUtil.cross(r1,impulse));
+		}
 
-		Vector2f delta2 = new Vector2f(impulse);
-		delta2.scale(body2.getInvMass());
-		body2.adjustVelocity(delta2);
-		body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2,impulse));
-
+		if (!body2.isStatic()) {
+			Vector2f delta2 = new Vector2f(impulse);
+			delta2.scale(body2.getInvMass());
+			body2.adjustVelocity(delta2);
+			body2.adjustAngularVelocity(body2.getInvI() * MathUtil.cross(r2,impulse));
+		}
+		
 		accumulatedImpulse.add(impulse);
 	}
 	
