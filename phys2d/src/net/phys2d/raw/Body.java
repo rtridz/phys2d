@@ -145,21 +145,10 @@ public strictfp class Body {
 	/** True if this body is capable of coming to a resting state */
 	private boolean canRest = true;
 	
-	/**
-	 * Attach an object to this Body. Any previously
-	 * set userdata will be lost.
-	 * 
-	 * @param o The (new) userdata.
-	 */
-	public void setUserData(Object o) { userData = o; }
-	
-	/**
-	 * Retrieved the attached object which initially
-	 * will be null.
-	 * 
-	 * @return The attached userdata.
-	 */
-	public Object getUserData() { return userData; }
+	/** True if this body can rotate */
+	private boolean rotatable = true;
+	/** True if this body can move */
+	private boolean moveable = true;
 	
 	/**
 	 * Create a new un-named body
@@ -181,7 +170,6 @@ public strictfp class Body {
 		this("UnnamedBody",shape,m);
 	}
 
-	
 	/**
 	 * Create a named body
 	 * 
@@ -223,6 +211,79 @@ public strictfp class Body {
 		set(shape,m);
 	}
 
+	
+	/**
+	 * Attach an object to this Body. Any previously
+	 * set userdata will be lost.
+	 * 
+	 * @param o The (new) userdata.
+	 */
+	public void setUserData(Object o) { 
+		userData = o; 
+	}
+	
+	/**
+	 * Retrieved the attached object which initially
+	 * will be null.
+	 * 
+	 * @return The attached userdata.
+	 */
+	public Object getUserData() { 
+		return userData; 
+	}
+	
+	/**
+	 * Check if this body can rotate.
+	 * 
+	 * @return True if this body can rotate
+	 */
+	public boolean isRotatable() {
+		return rotatable;
+	}
+	
+	/**
+	 * Check if this body can move
+	 * 
+	 * @return True if this body can move
+	 */
+	public boolean isMoveable() {
+		return moveable;
+	}
+	
+	/**
+	 * Indicate whether this body should be able to rotate. Use this feature at
+	 * you own risk - other bodies will react as tho this body has rotated when
+	 * hit so there may be artefacts involved with it's use.
+	 * 
+	 * Note also that this only prevents rotations caused by physics model updates. It
+	 * is still possible to explicitly set the rotation of the body with 
+	 * #setRotation()
+	 * 
+	 * The default value is true
+	 * 
+	 * @param rotatable True if this body is rotatable
+	 */
+	public void setRotatable(boolean rotatable) {
+		this.rotatable = rotatable;
+	}
+
+	/**
+	 * Indicate whether this body should be able to moe. Use this feature at
+	 * you own risk - other bodies will react as tho this body has moved when
+	 * hit so there may be artefacts involved with it's use.
+	 * 
+	 * Note also that this only prevents movement caused by physics model updates. It
+	 * is still possible to explicitly set the position of the body with 
+	 * #setPosition()
+	 * 
+	 * The default value is true
+	 * 
+	 * @param moveable True if this body is rotatable
+	 */
+	public void setMoveable(boolean moveable) {
+		this.moveable = moveable;
+	}
+	
 	/**
 	 * Enable resting body detection.
 	 * 
@@ -850,6 +911,9 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustVelocity(Vector2f delta) {
+		if (!isMoveable()) {
+			return;
+		}
 		lastVelocity.set(velocity);
 		velocity.add(delta);
 	}
@@ -860,6 +924,9 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustAngularVelocity(float delta) {
+		if (!isRotatable()) {
+			return;
+		}
 		lastAngularVelocity = angularVelocity;
 		angularVelocity += delta;
 	}
@@ -958,6 +1025,9 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustBiasedVelocity(Vector2f delta) {
+		if (!isMoveable()) {
+			return;
+		}
 		biasedVelocity.add(delta);
 	}
 	
@@ -967,6 +1037,9 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustBiasedAngularVelocity(float delta) {
+		if (!isRotatable()) {
+			return;
+		}
 		biasedAngularVelocity += delta;
 	}
 	
