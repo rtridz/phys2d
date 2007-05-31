@@ -138,6 +138,8 @@ public strictfp class Body {
 	private boolean touchingStatic = false;
 	/** Number of bodies we're touching */
 	private int touchingCount;
+	/** True if this body is capable of coming to a resting state */
+	private boolean canRest = true;
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -232,9 +234,32 @@ public strictfp class Body {
 	}
 	
 	/**
+	 * Indicate whether this body can come to a resting state. The default is true, but it
+	 * is sometimes useful for dynamic objects to prevent them resting.
+	 * 
+	 * @param canRest True if the body can come to a resting state
+	 */
+	public void setCanRest(boolean canRest) {
+		this.canRest = canRest;
+	}
+	
+	/**
+	 * Check if this body can come to a resting state
+	 * 
+	 * @return True if the body can come to a resting state
+	 */
+	public boolean canRest() {
+		return canRest;
+	}
+	
+	/**
 	 * Notification that we've started an update frame/iteration
 	 */
 	void startFrame() {
+		if (!canRest()) {
+			return;
+		}
+		
 		oldPosition = new Vector2f(getPosition());
 		hitByAnother = false;
 		hitCount = 0;
@@ -270,6 +295,10 @@ public strictfp class Body {
 	 * Notification that we've ended an update frame/iteration
 	 */
 	public void endFrame() {
+		if (!canRest()) {
+			return;
+		}
+		
 		if ((hitCount == 0) || (touchingCount != touching.size())) {
 			isResting = false;
 			setMass(originalMass);

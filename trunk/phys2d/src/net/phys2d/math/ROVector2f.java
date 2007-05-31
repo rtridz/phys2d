@@ -89,4 +89,20 @@ public interface ROVector2f {
 	 * @return The length of the vector squared
 	 */
 	public float lengthSquared();
+
+	/**
+	 * Get the distance from this point to another
+	 * 
+	 * @param other The other point we're measuring to
+	 * @return The distance to the other point
+	 */
+	public float distance(ROVector2f other);
+
+	/**
+	 * Get the distance squared from this point to another
+	 * 
+	 * @param other The other point we're measuring to
+	 * @return The distance to the other point
+	 */
+	public float distanceSquared(ROVector2f other);
 }
