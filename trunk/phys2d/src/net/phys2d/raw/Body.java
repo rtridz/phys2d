@@ -69,6 +69,10 @@ public strictfp class Body {
 	private Vector2f velocity = new Vector2f();
 	/** The angular velocity of this body */
 	private float angularVelocity;
+	/** The last velocity of this body (before last update) */
+	private Vector2f lastVelocity = new Vector2f();
+	/** The last angular velocity of this body (before last update) */
+	private float lastAngularVelocity;
 	
 	/** The velocity of this body */
 	private Vector2f biasedVelocity = new Vector2f();
@@ -731,6 +735,26 @@ public strictfp class Body {
 	}
 	
 	/**
+	 * Get the velocity before the last update. This is useful
+	 * during collisions to determine the change in velocity on impact
+	 * 
+	 * @return The last velocity
+	 */
+	public ROVector2f getLastVelocity() {
+		return lastVelocity;
+	}
+
+	/**
+	 * Get the angular velocity before the last update. This is useful
+	 * during collisions to determine the change in angular velocity on impact
+	 * 
+	 * @return The last velocity
+	 */
+	public float getLastAngularVelocity() {
+		return lastAngularVelocity;
+	}
+	
+	/**
 	 * Get the rotation in radians of this body
 	 * 
 	 * @return The rotation of this body
@@ -826,6 +850,7 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustVelocity(Vector2f delta) {
+		lastVelocity.set(velocity);
 		velocity.add(delta);
 	}
 	
@@ -835,6 +860,7 @@ public strictfp class Body {
 	 * @param delta The amount to change the velocity by
 	 */
 	public void adjustAngularVelocity(float delta) {
+		lastAngularVelocity = angularVelocity;
 		angularVelocity += delta;
 	}
 	
