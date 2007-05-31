@@ -69,6 +69,20 @@ public strictfp class StaticBody extends Body {
 	}
 
 	/**
+	 * @see net.phys2d.raw.Body#isRotatable()
+	 */
+	public boolean isRotatable() {
+		return false;
+	}
+	
+	/**
+	 * @see net.phys2d.raw.Body#isMoveable()
+	 */
+	public boolean isMoveable() {
+		return false;
+	}
+	
+	/**
 	 * Check if this body is static
 	 * 
 	 * @return True if this body is static
