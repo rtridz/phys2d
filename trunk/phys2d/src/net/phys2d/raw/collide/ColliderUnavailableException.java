@@ -63,9 +63,9 @@ public class ColliderUnavailableException extends Exception {
 	 */
 	public ColliderUnavailableException(Shape shapeA, Shape shapeB) {
 		super(	"No collider available for shapes of type " 
-				+ shapeA.getClass().getCanonicalName()
+				+ shapeA.getClass().getName()
 				+ " and "
-				+ shapeB.getClass().getCanonicalName());
+				+ shapeB.getClass().getName());
 	}
 	
 	
