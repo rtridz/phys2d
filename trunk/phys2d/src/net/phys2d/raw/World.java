@@ -415,4 +415,14 @@ public strictfp class World extends CollisionSpace {
 		body.configureRestingBodyDetection(hitTolerance, rotationTolerance, positionTolerance);
 		super.add(body);
 	}
+
+	/**
+	 * Remove a body from the simulation
+	 * 
+	 * @param body The body to be removed
+	 */
+	public void remove(Body body) {
+		clearArbiters(body);
+		super.remove(body);
+	}
 }
