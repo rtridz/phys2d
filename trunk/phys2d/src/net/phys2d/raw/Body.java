@@ -149,6 +149,8 @@ public strictfp class Body {
 	private boolean rotatable = true;
 	/** True if this body can move */
 	private boolean moveable = true;
+	/** True if this body is enabled */
+	private boolean enabled = true;
 	
 	/**
 	 * Create a new un-named body
@@ -158,6 +160,24 @@ public strictfp class Body {
 	 */
 	public Body(DynamicShape shape, float m) {
 		this("UnnamedBody",(Shape) shape,m);
+	}
+	
+	/**
+	 * Check if this body is disabled
+	 * 
+	 * @return True if this body is disabled
+	 */
+	public boolean disabled() {
+		return !enabled;
+	}
+	
+	/**
+	 * Indicates whether this body should be active, collide, move/rotate
+	 * 
+	 * @param enabled True if this body should be active
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 	
 	/**
@@ -238,6 +258,10 @@ public strictfp class Body {
 	 * @return True if this body can rotate
 	 */
 	public boolean isRotatable() {
+		if (disabled()) {
+			return false;
+		}
+		
 		return rotatable;
 	}
 	
@@ -247,6 +271,10 @@ public strictfp class Body {
 	 * @return True if this body can move
 	 */
 	public boolean isMoveable() {
+		if (disabled()) {
+			return false;
+		}
+		
 		return moveable;
 	}
 	

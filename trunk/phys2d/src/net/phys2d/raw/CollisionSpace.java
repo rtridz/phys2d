@@ -137,10 +137,16 @@ public class CollisionSpace implements CollisionContext {
 		for (int i = 0; i < bodyList.size(); ++i)
 		{
 			Body bi = bodyList.get(i);
+			if (bi.disabled()) {
+				continue;
+			}
 			
 			for (int j = i+1; j < bodyList.size(); ++j)
 			{
 				Body bj = bodyList.get(j);
+				if (bj.disabled()) {
+					continue;
+				}
 				if ((bitmask & bi.getBitmask() & bj.getBitmask()) == 0) {
 					continue;
 				}
