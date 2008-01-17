@@ -824,6 +824,18 @@ public strictfp class Body {
 	}
 	
 	/**
+	 * Get the change in position in the last update
+	 * 
+	 * @return The change in position in the last update 
+	 */
+	public ROVector2f getPositionDelta() {
+		Vector2f vec = new Vector2f(getPosition());
+		vec.sub(getLastPosition());
+		
+		return vec;
+	}
+	
+	/**
 	 * Get the velocity before the last update. This is useful
 	 * during collisions to determine the change in velocity on impact
 	 * 
@@ -834,6 +846,18 @@ public strictfp class Body {
 	}
 
 	/**
+	 * Get the change in velocity in the last update
+	 * 
+	 * @return The change in velocity in the last update 
+	 */
+	public ROVector2f getVelocityDelta() {
+		Vector2f vec = new Vector2f(getVelocity());
+		vec.sub(getLastVelocity());
+		
+		return vec;
+	}
+	
+	/**
 	 * Get the angular velocity before the last update. This is useful
 	 * during collisions to determine the change in angular velocity on impact
 	 * 
@@ -841,6 +865,15 @@ public strictfp class Body {
 	 */
 	public float getLastAngularVelocity() {
 		return lastAngularVelocity;
+	}
+
+	/**
+	 * Get the change in angular velocity in the last update
+	 * 
+	 * @return The change in angular velocity in the last update 
+	 */
+	public float getAngularVelocityDelta() {
+		return getAngularVelocity() - getLastAngularVelocity();
 	}
 	
 	/**
