@@ -43,6 +43,7 @@ package net.phys2d.raw;
 import java.util.ArrayList;
 
 import net.phys2d.math.Vector2f;
+import net.phys2d.raw.forcesource.ForceSource;
 import net.phys2d.raw.strategies.BruteCollisionStrategy;
 
 /**
@@ -68,6 +69,8 @@ public strictfp class World extends CollisionSpace {
 	private float rotationTolerance; 
 	/** The amoutn a body has to move for it to be considered non-resting */
 	private float positionTolerance; 
+	/** The force sources in the world */
+	private ArrayList sources = new ArrayList();
 	
 	/**
 	 * Create a new physics model World
@@ -95,6 +98,24 @@ public strictfp class World extends CollisionSpace {
 		this.gravity = gravity;
 		this.iterations = iterations;
 
+	}
+	
+	/**
+	 * Add a source to affect bodies in this world
+	 * 
+	 * @param source The source to affect bodies in this world
+	 */
+	public void add(ForceSource source) {
+		sources.add(source);
+	}
+	
+	/**
+	 * Remove a force source from the world
+	 * 
+	 * @param source The source that should no longer affect the bodies in this world
+	 */
+	public void remove(ForceSource source) {
+		sources.remove(source);
 	}
 	
 	/**
@@ -247,6 +268,13 @@ public strictfp class World extends CollisionSpace {
 	 * @param dt The amount of time to step
 	 */
 	public void step(float dt) {
+		for (int i = 0; i < bodies.size(); ++i)
+		{
+			for (int j=0;j<sources.size();j++) {
+				((ForceSource) sources.get(j)).apply(bodies.get(i), dt);
+			}
+		}
+		
 		BodyList bodies = getActiveBodies();
 		JointList joints = getActiveJoints();
 		
