@@ -677,6 +677,16 @@ public strictfp class Body {
 	}
 
 	/**
+	 * Reset the shape of this body
+	 * 
+	 * @param shape The new shape of this body
+	 */
+	public void setShape(Shape shape) {
+		this.shape = shape;
+		//setMass(mass);
+	}
+	
+	/**
 	 * Set the mass of the body
 	 * 
 	 * @param m The new mass of the body
