@@ -152,6 +152,9 @@ public strictfp class Body {
 	/** True if this body is enabled */
 	private boolean enabled = true;
 	
+	/** True if this body has been added to the simulation */
+	private boolean added = false;
+	
 	/**
 	 * Create a new un-named body
 	 * 
@@ -231,6 +234,14 @@ public strictfp class Body {
 		set(shape,m);
 	}
 
+	/**
+	 * Get the ID of this body
+	 * 
+	 * @return The unique ID of this body
+	 */
+	public int getID() {
+		return id;
+	}
 	
 	/**
 	 * Attach an object to this Body. Any previously
@@ -1171,5 +1182,23 @@ public strictfp class Body {
 	 */
 	public void removeBit(long bitmask) {
 		this.bitmask -= bitmask & this.bitmask;
+	}
+	
+	/**
+	 * Check the added to simulation flag
+	 * 
+	 * @return The added to simulation flag
+	 */
+	public boolean added() {
+		return added;
+	}
+	
+	/**
+	 * Set the added to simulation flag
+	 * 
+	 * @param added The added to simulation flag
+	 */
+	public void setAdded(boolean added) {
+		this.added = added;
 	}
 }

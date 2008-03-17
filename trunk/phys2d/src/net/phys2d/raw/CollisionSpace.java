@@ -77,6 +77,7 @@ public class CollisionSpace implements CollisionContext {
 	 * @param body The body to be added
 	 */
 	public void add(Body body) {
+		body.setAdded(true);
 		bodies.add(body);
 	}
 	
@@ -86,6 +87,7 @@ public class CollisionSpace implements CollisionContext {
 	 * @param body The body to be removed
 	 */
 	public void remove(Body body) {
+		body.setAdded(false);
 		bodies.remove(body);
 	}
 	

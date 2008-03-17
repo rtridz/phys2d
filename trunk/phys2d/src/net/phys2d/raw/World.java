@@ -385,6 +385,22 @@ public strictfp class World extends CollisionSpace {
 				b.endFrame();
 			}
 		}
+		
+		cleanUpArbiters();
+	}
+	
+	/**
+	 * Clean up the arbiters for departied bodies
+	 */
+	private void cleanUpArbiters() {
+		for (int i=0;i<arbiters.size();i++) {
+			Arbiter arbiter = arbiters.get(i);
+			
+			if (!arbiter.getBody1().added() || !arbiter.getBody2().added()) {
+				arbiters.remove(arbiter);
+				i--;
+			}
+		}
 	}
 	
 	/**

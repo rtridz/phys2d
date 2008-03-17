@@ -220,7 +220,9 @@ public strictfp class Arbiter {
 	 * @return True if this arbiter effects the body
 	 */
 	public boolean concerns(Body body) {
-		return (body1 == body) || (body2 == body);
+		boolean result = (body1 == body) || (body2 == body);
+		
+		return result;
 	}
 	
 	/**
