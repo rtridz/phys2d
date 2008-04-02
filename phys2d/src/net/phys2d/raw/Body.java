@@ -113,7 +113,7 @@ public strictfp class Body {
 	private boolean gravity = true;
 	
 	/** The collision group bitmask */
-	private long bitmask = 0xFFFFFFFFFFFFFFFFL;
+	private long bitmask = 0; //0xFFFFFFFFFFFFFFFFL;
 	/** A hook for the library's user's data */
 	private Object userData = null;
 	/** The old position */
