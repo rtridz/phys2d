@@ -155,6 +155,9 @@ public strictfp class Body {
 	/** True if this body has been added to the simulation */
 	private boolean added = false;
 	
+	/** The maximum velocity the the body can travel at on each axis */
+	private Vector2f maxVelocity;
+	
 	/**
 	 * Create a new un-named body
 	 * 
@@ -998,6 +1001,8 @@ public strictfp class Body {
 		}
 		lastVelocity.set(velocity);
 		velocity.add(delta);
+		
+		validateVelocity();
 	}
 	
 	/** 
@@ -1200,5 +1205,43 @@ public strictfp class Body {
 	 */
 	public void setAdded(boolean added) {
 		this.added = added;
+	}
+	
+	/**
+	 * Set the maximum velocity this body can reach. Note that these
+	 * values arn't signed since they're magnitudes.
+	 * 
+	 * @param maxX The maximum velocity on the X axis
+	 * @param maxY The maximum veloicty on the Y axis
+	 */
+	public void setMaxVelocity(float maxX, float maxY) {
+		maxVelocity = new Vector2f(maxX, maxY);
+	}
+	
+	/**
+	 * Validate the velocity value thats just been applied. Correct
+	 * it if it breaks any rules. The primary rule is maximum velocity
+	 * setting
+	 */
+	protected void validateVelocity() {
+		if (maxVelocity == null) {
+			return;
+		}
+		
+		if (Math.abs(velocity.x) > maxVelocity.x) {
+			if (velocity.x > 0) {
+				velocity.x = maxVelocity.x;
+			} else {
+				velocity.x = -maxVelocity.x;
+			}
+		}
+		
+		if (Math.abs(velocity.y) > maxVelocity.y) {
+			if (velocity.y > 0) {
+				velocity.y = maxVelocity.y;
+			} else {
+				velocity.y = -maxVelocity.y;
+			}
+		}
 	}
 }
