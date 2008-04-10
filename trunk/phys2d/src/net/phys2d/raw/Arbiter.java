@@ -462,10 +462,11 @@ public strictfp class Arbiter {
 			// Apply contact impulse
 			Vector2f impulse = MathUtil.scale(c.normal, normalImpulse);
 			
-			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass()));
+			Vector2f temp = new Vector2f();
+			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass(), temp));
 			b1.adjustAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, impulse)));
 
-			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass()));
+			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass(), temp));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
 
 			// Compute bias impulse
@@ -483,10 +484,10 @@ public strictfp class Arbiter {
 
 			Vector2f Pb = MathUtil.scale(c.normal, biasImpulse);
 			
-			b1.adjustBiasedVelocity(MathUtil.scale(Pb, -b1.getInvMass()));
+			b1.adjustBiasedVelocity(MathUtil.scale(Pb, -b1.getInvMass(), temp));
 			b1.adjustBiasedAngularVelocity(-(b1.getInvI() * MathUtil.cross(r1, Pb)));
 
-			b2.adjustBiasedVelocity(MathUtil.scale(Pb, b2.getInvMass()));
+			b2.adjustBiasedVelocity(MathUtil.scale(Pb, b2.getInvMass(), temp));
 			b2.adjustBiasedAngularVelocity((b2.getInvI() * MathUtil.cross(r2, Pb)));
 
 			// END NEW STUFF
@@ -514,10 +515,10 @@ public strictfp class Arbiter {
 			// Apply contact impulse
 			impulse = MathUtil.scale(tangent, tangentImpulse);
 			
-			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass()));
+			b1.adjustVelocity(MathUtil.scale(impulse, -b1.getInvMass(), temp));
 			b1.adjustAngularVelocity(-b1.getInvI() * MathUtil.cross(r1, impulse));
 
-			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass()));
+			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass(), temp));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
 		}
 	}
