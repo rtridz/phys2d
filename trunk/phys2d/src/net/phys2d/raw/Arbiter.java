@@ -469,6 +469,14 @@ public strictfp class Arbiter {
 			b2.adjustVelocity(MathUtil.scale(impulse, b2.getInvMass(), temp));
 			b2.adjustAngularVelocity(b2.getInvI() * MathUtil.cross(r2, impulse));
 
+			// skip factors if the accumulated normal impulse is lower than tolerance
+			// this tolerance should be calculated on something else, but can't work out
+			// what
+			if ((c.accumulatedNormalImpulse / b1.getMass() < 5) &&
+			   (c.accumulatedNormalImpulse / b2.getMass() < 5)) {
+				c.restitution = 0;
+			}
+			
 			// Compute bias impulse
 			// NEW STUFF FOR SEPERATING BIAS
 			relativeVelocity.set(b2.getBiasedVelocity());
