@@ -428,6 +428,11 @@ public strictfp class Arbiter {
 	 * by this arbiter.
 	 */
 	void applyImpulse() {
+		// the amount of impulse per mass unit that must be applied before
+		// restitution will have any effect. This gives more stability at
+		// rest
+		float restResponseImpulse = 5;
+		
 		Body b1 = body1;
 		Body b2 = body2;
 		
@@ -472,8 +477,8 @@ public strictfp class Arbiter {
 			// skip factors if the accumulated normal impulse is lower than tolerance
 			// this tolerance should be calculated on something else, but can't work out
 			// what
-			if ((c.accumulatedNormalImpulse / b1.getMass() < 5) &&
-			   (c.accumulatedNormalImpulse / b2.getMass() < 5)) {
+			if ((c.accumulatedNormalImpulse / b1.getMass() < restResponseImpulse) &&
+			   (c.accumulatedNormalImpulse / b2.getMass() < restResponseImpulse)) {
 				c.restitution = 0;
 			}
 			

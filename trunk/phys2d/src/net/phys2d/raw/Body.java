@@ -697,7 +697,6 @@ public strictfp class Body {
 	 */
 	public void setShape(Shape shape) {
 		this.shape = shape;
-		//setMass(mass);
 	}
 	
 	/**
@@ -705,7 +704,7 @@ public strictfp class Body {
 	 * 
 	 * @param m The new mass of the body
 	 */
-	private void setMass(float m) {
+	public void setMass(float m) {
 		mass = m;
 
 		if (mass < INFINITE_MASS)
