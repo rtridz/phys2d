@@ -651,7 +651,7 @@ public strictfp class Body {
 	/**
 	 * Set the "restitution" of the body. Hard bodies transfer
 	 * momentum well. A value of 1.0 would be a pool ball. The 
-	 * default is 1f
+	 * default is 0f
 	 * 
 	 * @param rest The restitution of this body
 	 */
